@@ -19,6 +19,8 @@ Authors: David Thomas Callaghan^1^*, Paul James Blanchfield^1,2^, Matt M. Guzzo^
 
 *Corresponding Author Email: callagdt@myumanitoba.ca
 
+Dave Dave Dave
+
 #Abstract
 
 This thesis investigates lake trout (*Salvelinus namaycush*) reproduction northern lakes. Lake trout have a broad distribution across Canada's North, yet most studies that describe reproductive habitat are from the southern extent of their range. I first assessed whether lake trout spawning habitat, typically characterized as wave-swept shoals with clean cobble that face predominant wind directions, is similar for a northern lake. Specifically, I examined a dozen sites around Alexie Lake, Northwest Territories, to test if physical habitat and wind exposure were important determinants of spawning site use and embryonic survival. Spawning occurred in ~2 m water depth, on 3–15 cm diameter clean substrate found on the leading edge of shoals that ended in a rock crib rising abruptly in nearshore regions around the lake. Wind direction was predominantly from the west, although it was highly variable within and among spawning seasons. I found evidence of lake trout spawning at each site examined, but not limited to shoals facing a predominate wind direction. High variation in embryonic survival (2–83%) from incubation trays was observed among spawning sites, suggesting a large gradient in habitat quality exists within a given lake. Modelled wind exposure did not predict embryonic survival, nor did physical characteristics that may influence interstitial water flow on spawning shoals. 
