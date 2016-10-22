@@ -21,7 +21,11 @@ Authors: David Thomas Callaghan^1^*, Paul James Blanchfield^1,2^, Matt M. Guzzo^
 
 *Corresponding Author Email: callagdt@myumanitoba.ca
 
+<<<<<<< HEAD
 Dave Dave DAVE Dave
+=======
+Dave Dave Dave
+>>>>>>> 120d10f45497910ba7ea22d800e58ac29dce4db8
 
 #Abstract
 
