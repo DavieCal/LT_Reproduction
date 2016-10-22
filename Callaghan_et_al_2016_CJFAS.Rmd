@@ -1,5 +1,7 @@
 ---
 output:
+  md_document:
+    variant: markdown_github
   word_document:
     fig_caption: yes
     pandoc_args: --smart
@@ -18,6 +20,8 @@ Authors: David Thomas Callaghan^1^*, Paul James Blanchfield^1,2^, Matt M. Guzzo^
 ^3^ Cumulative Impact Monitoring Program - Environment and Natural Resources, Government of the Northwest Territories, Box 1320, Yellowknife, Northwest Territories X1A 2L9, Canada.
 
 *Corresponding Author Email: callagdt@myumanitoba.ca
+
+Dave Dave DAVE Dave
 
 #Abstract
 
