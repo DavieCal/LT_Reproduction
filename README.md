@@ -9,7 +9,7 @@ output:
 csl: canadian-journal-of-fisheries-and-aquatic-sciences.csl
 ---
 
-Title: Lake trout (*Savelinus namaycush*) reproductive behaviour in a northern lake
+Title: Lake trout (*Savelinus namaycush*) reproductive behaviour in a northern lake. SPatial temporal clustering
 
 Authors: David Thomas Callaghan^1^*, Paul James Blanchfield^1,2^, Matt M. Guzzo^1^, and Peter A. Cott^3^
 
