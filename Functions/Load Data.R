@@ -9,16 +9,19 @@ require(maptools)
 require(raster)
 
 #load functions
-source('~/Documents/R-Directory/Masters Thesis/VPS Error/VPS Error Functions.R')
+source('Functions/VPS Error Functions.R')
 
 #####Step 1#### 
 #Inputting and Importing Data
 
 #VPS data 2013
 #Load VPS csv
-all_data<-read.csv("~/Documents/Masters Thesis/Data/VPS/VPS 2013/ALL-CALC-POSITIONS1.csv")
-all_data2<-read.csv("~/Documents/Masters Thesis/Data/VPS/VPS 2013/ALL-CALC-POSITIONS2.csv")
-all_data3<-read.csv("~/Documents/Masters Thesis/Data/VPS/VPS 2013/ALL-CALC-POSITIONS3.csv")
+all_data1<-read.csv("Data/VPS 2012/ALL-CALC-POSITIONS.csv")
+all_data2<-read.csv("Data/VPS 2013/ALL-CALC-POSITIONS1.csv")
+all_data3<-read.csv("Data/VPS 2013/ALL-CALC-POSITIONS2.csv")
+all_data4<-read.csv("Data/VPS 2013/ALL-CALC-POSITIONS3.csv")
+all_data5<-read.csv("Data/VPS 2014/ALL-CALC-POSITIONS.csv")
+
 #combine summer and winter datasets
 all_data<-rbind(all_data,all_data2,all_data3)
 #remove winter data set
