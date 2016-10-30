@@ -14,7 +14,7 @@
 #if the raster already exists it will skip this step
 if(!exists("r")){
   require(SDMTools)
-  bathy<-read.asc("~/Documents/Masters Thesis/Data/GIS/Alexie Lake/Alexie Raster/bathy.asc")
+  bathy<-read.asc("~/Data/GIS//bathy.asc")
   #assign raster class object
   r<-raster.from.asc(bathy)
   #assign projection
@@ -29,7 +29,7 @@ require(rgeos)
 require(maptools)
 if(!exists("shore_outline")){
   #load shoreline polygon and projection
-  shore_outline<-readShapeSpatial("~/Documents/Masters Thesis/Data/GIS/qgis/Alexie.shp")
+  shore_outline<-readShapeSpatial("~/Data/GIS/Alexie.shp")
   proj4string(shore_outline)<-CRS("+proj=utm +zone=11 +ellps=WGS84")
 }
 ##test data
@@ -46,7 +46,7 @@ data<-data[order(data$DATETIME), ]
 #reports any duplicates for a single individual in terms of timestamps
 if (any(duplicated(unclass(data$DATETIME)))){
   print(paste("duplicate timestamps:", sum(duplicated(unclass(data$DATETIME)))))
-  readline(prompt="Press [enter] to continue")
+  #readline(prompt="Press [enter] to continue")
   data.clean <- data[!duplicated(data[,c("DATETIME", "UTM.X", "UTM.Y")]),]
 }else {
   print("No duplicates")
@@ -88,7 +88,7 @@ require(rgeos)
 require(maptools)
 if(!exists("shore_outline")){
 #load shoreline polygon and projection
-shore_outline<-readShapeSpatial("~/Documents/Masters Thesis/Data/GIS/qgis/Alexie.shp")
+shore_outline<-readShapeSpatial("~/Data/GIS/Alexie.shp")
 proj4string(shore_outline)<-CRS("+proj=utm +zone=11 +ellps=WGS84")
 }
 
@@ -96,7 +96,7 @@ proj4string(shore_outline)<-CRS("+proj=utm +zone=11 +ellps=WGS84")
 
 if(!exists("shore.dist")){
   require(SDMTools)
-  shore.dist<-read.asc("~/Documents/Masters Thesis/Data/GIS/Alexie Lake/Alexie Raster/shoredist2.asc")
+  shore.dist<-read.asc("~/Data/GIS/shoredist2.asc")
   #assign raster class object
   shore.dist<-raster.from.asc(shore.dist)
   #assign projection
@@ -130,7 +130,7 @@ data.clean$INLAKE[is.na(data.clean$INLAKE)]=0
 #if the raster already exists it will skip this step
 if(!exists("r")){
   require(SDMTools)
-  bathy<-read.asc("~/Documents/Masters Thesis/Data/GIS/Alexie Lake/Alexie Raster/bathy.asc")
+  bathy<-read.asc("~/Data/GIS/bathy.asc")
   #assign raster class object
   r<-raster.from.asc(bathy)
   #assign projection

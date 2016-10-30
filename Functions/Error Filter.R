@@ -4,8 +4,8 @@
 #HPE filter to remove points with a 2DRMS > 27 m
 fish<-pos[pos$HPE<106.1,]
 
-#data retention 97%
-round(dim(fish)[1]/dim(pos)[1],digits=2)*100
+#data retention 94%
+hpe.dat.ret<-round(dim(fish)[1]/dim(pos)[1],digits=2)*100
 
 #check out where the bad points are
 plot(shore_outline)
@@ -17,7 +17,7 @@ fish$DEPTH[is.na(fish$DEPTH)]=-1
 
 ####BioFilter####
 
-source("/Users/DavieCal/Documents/R-Directory/Masters Thesis/VPS Error/Bio Filter Function.R")
+source("Functions/Bio Filter Function.R")
 
 #split dataframe into a list of tag data frames
 data_unclean<-split(fish,fish$TRANSMITTER)
@@ -32,13 +32,13 @@ fish_correct$DEPTH[fish_correct$DEPTH==-1]=NA
 fish_final<-fish_correct[fish_correct$DATASCORE==3,]
 
 #87% data retention
-dim(fish_final)[1]/dim(pos)[1]
+bio.data.ret<-dim(fish_final)[1]/dim(pos)[1]
 
 
 fish<-fish_final
 
 
-save(fish,file="2013.filter.fish.RData")
+save(fish,file="~/Data/filter.fish.RData")
 
 #remove clutter
 rm(data_unclean)
