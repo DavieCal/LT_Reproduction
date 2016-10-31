@@ -1,3 +1,4 @@
+
 #plots 6.15 x 4.76
 source('~/Google Drive/st-dbscan/st-dbscan function.R')
 library(lubridate)
@@ -12,8 +13,17 @@ library(FNN)
 library(rgeos)
 library(circular)
 
-male<-c("LT-1","LT-3","LT-8","LT-22","LT-31","LT-33","LT-34","LT-36","LT-37","LT-39","LT-40","LT-42","LT-45")
-female<-c("LT-17","LT-32","LT-35","LT-38","LT-41","LT-43","LT-44","LT-46","LT-47")
+male<-c("LT-1","LT-3","LT-8","LT-22","LT-31","LT-33",
+        "LT-34","LT-36","LT-37","LT-39","LT-40","LT-42",
+        "LT-45")
+female<-c("LT-17","LT-32","LT-35","LT-38","LT-41","LT-43",
+          "LT-44","LT-46","LT-47")
+unknown<-c("LT-10", "LT-11", "LT-12", "LT-13", "LT-14",
+           "LT-15", "LT-16", "LT-18", "LT-19", "LT-2",
+           "LT-20", "LT-21", "LT-24", "LT-25", "LT-26",
+           "LT-27", "LT-28", "LT-29", "LT-30", "LT-4",
+           "LT-5", "LT-7", "LT-9", "LT-23")
+
 lt<-as.factor(c(male,female))
 
 ##extract year
