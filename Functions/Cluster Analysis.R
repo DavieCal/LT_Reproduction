@@ -1,6 +1,6 @@
 
 #plots 6.15 x 4.76
-source('~/Google Drive/st-dbscan/st-dbscan function.R')
+source('Functions/st-dbscan function.R')
 library(lubridate)
 library(adehabitatHR)
 #library(rgl)
@@ -13,20 +13,45 @@ library(FNN)
 library(rgeos)
 library(circular)
 
+#Classify males, females and unknowns
 male<-c("LT-1","LT-3","LT-8","LT-22","LT-31","LT-33",
-        "LT-34","LT-36","LT-37","LT-39","LT-40","LT-42",
-        "LT-45")
+        "LT-34","LT-36","LT-37","LT-39","LT-40","LT-45")
+
 female<-c("LT-17","LT-32","LT-35","LT-38","LT-41","LT-43",
           "LT-44","LT-46","LT-47")
+
 unknown<-c("LT-10", "LT-11", "LT-12", "LT-13", "LT-14",
            "LT-15", "LT-16", "LT-18", "LT-19", "LT-2",
            "LT-20", "LT-21", "LT-24", "LT-25", "LT-26",
            "LT-27", "LT-28", "LT-29", "LT-30", "LT-4",
            "LT-5", "LT-7", "LT-9", "LT-23")
 
-lt<-as.factor(c(male,female))
+lt<-as.factor(c(male,female,unknown))
 
-##extract year
+#assign tags to surgery groups
+group2012<-paste0("LT-",c(1:30))
+group2013<-paste0("LT-",c(31:44))
+group2014<-paste0("LT-",c(45:47))
+
+#assign tags with all data available for a given year
+good2012<-c("LT-1","LT-2","LT-3","LT-4",
+"LT-5","LT-7","LT-8","LT-9","LT-10","LT-11",
+"LT-12","LT-13","LT-14","LT-15","LT-16","LT-17",
+"LT-18","LT-19","LT-20","LT-21","LT-22","LT-24",
+"LT-25","LT-26","LT-27","LT-28","LT-29","LT-30")
+
+good2013<-c("LT-1","LT-2","LT-3","LT-5","LT-7",
+"LT-8","LT-9","LT-13","LT-14","LT-15","LT-17",
+"LT-18","LT-19","LT-21","LT-22","LT-26","LT-28",
+"LT-29","LT-30","LT-31","LT-32","LT-33","LT-34",
+"LT-35","LT-37","LT-40","LT-41","LT-43","LT-44")
+
+good2014<-c("LT-1","LT-2","LT-3","LT-8","LT-9","LT-13",
+"LT-14","LT-15","LT-17","LT-18","LT-19","LT-22",
+"LT-26","LT-29","LT-30","LT-45","LT-46","LT-47")
+
+  
+##extract year,Month,day, hour
 
 fish$YEAR<-year(fish$DATETIME)
 fish$MONTH<-month(fish$DATETIME)
@@ -38,22 +63,31 @@ fish$SEX<-"U"
 fish$SEX[fish$TRANSMITTER %in% male]<-"M"
 fish$SEX[fish$TRANSMITTER %in% female]<-"F"
 
-
-
 #shore distance
-require(SDMTools)
-shore.dist<-read.asc("~/Documents/Masters Thesis/Data/GIS/Alexie Lake/Alexie Raster/shoredist.asc")
-#assign raster class object
-shore.dist<-raster.from.asc(shore.dist)
-#assign projection
-projection(shore.dist)<- "+proj=utm +zone=11 +ellps=WGS84"
+#check if it exists
+if(!exists("shore.dist")){
+  #if not load shore dist asc raster
+  require(SDMTools)
+  shore.dist<-read.asc("~/Data/GIS/shoredist2.asc")
+  #assign raster class object
+  shore.dist<-raster.from.asc(shore.dist)
+  #assign projection
+  projection(shore.dist)<- "+proj=utm +zone=11 +ellps=WGS84"
+  detach("package:SDMTools", unload=TRUE)
+}
+
+
 #extract distance from shore for each point
 fish$SHOREDIST<-extract(shore.dist, fish[,c(1,2)])
 fish$SHOREDIST[is.na(fish$SHOREDIST)]<-0
 
+#extract bottom depth at fish location
 fish$BOTTOMDEPTH<-(extract(r,fish[c("UTM.X","UTM.Y")]))
+
+#calculate distance between bottom depth and fish depth
 fish$OFFBOTTOM<-fish$BOTTOMDEPTH-fish$DEPTH
 
+####NOT RUN
 #####determine when 15 deg is less than 4m
 
 #create temp and oxygen data frames
@@ -102,26 +136,38 @@ depth15[depth15$Depth<=4,]
 #spring defined as days before 15deg C thermocline falls deeper than 4m
 #spawn is when  15deg C thermocline rises greater than 4m
 
-fish$SEASON<-"SUMMER"
-fish$SEASON[fish$DATETIME>=as.POSIXct("2013-08-30",tz="MST") & 
-                 fish$DATETIME<as.POSIXct("2013-10-01",tz="MST")]<-"SPAWN"
-fish$SEASON[fish$DATETIME>=as.POSIXct("2013-10-01",tz="MST")]<-"POSTSPAWN"
-fish$SEASON[fish$DATETIME>=as.POSIXct("2013-05-15",tz="MST") & 
-                   fish$DATETIME<as.POSIXct("2013-06-25",tz="MST")]<-"SPRING"
+######End of NOT RUN
+
+#Extract fish positions during spawn ~ September 
+fishspawn<-fish[fish$DATETIME>=as.POSIXct("2012-09-01",tz="MST") & 
+                  fish$DATETIME<as.POSIXct("2012-10-01",tz="MST") |
+                  fish$DATETIME>=as.POSIXct("2013-09-01",tz="MST") & 
+                  fish$DATETIME<as.POSIXct("2013-10-01",tz="MST") |
+                  fish$DATETIME>=as.POSIXct("2014-09-01",tz="MST") & 
+                  fish$DATETIME<as.POSIXct("2014-10-01",tz="MST")
+                ,]
 
 
-clust.param<-data.frame(Season=NULL,
+clust.param<-data.frame(Year=NULL,
                         ID=NULL,
                         MinPts=NULL,
                         EpsSpace=NULL,
                         EpsTime=NULL)
-season<-unique(fish$SEASON)
-tag<-c("LT-31","LT-32","LT-33","LT-34","LT-35","LT-37","LT-38","LT-40","LT-41","LT-43","LT-44")
+year<-unique(fishspawn$YEAR)
 
-for(i in 1:length(season)){
+#Loop for each year
+for(i in 1:length(year)){
+  #extract year specific data
+  fishy<-fishspawn[fishspawn$YEAR==year[i],]
+  #extract year specific tags
+  if(year[i]==2012){
+    tag<-good2012
+  }else if (year[i]==2013){
+    tag<-good2013
+  }else
+    tag<-good2014
   
-  fishy<-fish[fish$SEASON==season[i],]
-  #tag<-unique(fishy$TRANSMITTER)
+  #Loop for each tag within a year
   for(ii in 1:length(tag)){
     #load fish
     fishi<-fishy[fishy$TRANSMITTER==tag[ii],]
@@ -161,7 +207,7 @@ for(i in 1:length(season)){
     #draw cutoff line
     abline(h=ht,lty=2)
     
-    clust.p<-data.frame(Season=season[i],
+    clust.p<-data.frame(Year=year[i],
                         ID=tag[ii],
                         MinPts=k,
                         EpsSpace=hd,
@@ -174,61 +220,196 @@ rm(fishy)
 clust.param
 
                 
-#for each parameter a take the rounded mean of from the sampled animals
+#for each parameter a take the rounded mean of from the sampled animals for each year
 
-#Spring
-min_pts_spring<-round(summary(clust.param$MinPts[clust.param$Season=="SPRING"]))
-eps_space_spring<-round(summary(clust.param$EpsSpace[clust.param$Season=="SPRING"]))
-eps_time_spring<-round(summary(clust.param$EpsTime[clust.param$Season=="SPRING"]))
+#all
+round(summary(clust.param$MinPts))
+round(summary(clust.param$EpsSpace))
+round(summary(clust.param$EpsTime))
 
-#Summer
-min_pts_summer<-round(summary(clust.param$MinPts[clust.param$Season=="SUMMER"]))
-eps_space_summer<-round(summary(clust.param$EpsSpace[clust.param$Season=="SUMMER"]))
-eps_time_summer<-round(summary(clust.param$EpsTime[clust.param$Season=="SUMMER"]))
+#2012
+min_pts_2012<-round(summary(clust.param$MinPts[clust.param$Year==2012]))
+eps_space_2012<-round(summary(clust.param$EpsSpace[clust.param$Year==2012]))
+eps_time_2012<-round(summary(clust.param$EpsTime[clust.param$Year==2012]))
+
+#2013
+min_pts_2013<-round(summary(clust.param$MinPts[clust.param$Year==2013]))
+eps_space_2013<-round(summary(clust.param$EpsSpace[clust.param$Year==2013]))
+eps_time_2013<-round(summary(clust.param$EpsTime[clust.param$Year==2013]))
+
+#2013 - group 2012
+min_pts_2013_g2012<-round(summary(clust.param$MinPts[clust.param$Year==2013 & clust.param$ID %in% group2012]))
+eps_space_2013_g2012<-round(summary(clust.param$EpsSpace[clust.param$Year==2013 & clust.param$ID %in% group2012]))
+eps_time_2013_g2012<-round(summary(clust.param$EpsTime[clust.param$Year==2013 & clust.param$ID %in% group2012]))
+
+#2013 - group 2013
+min_pts_2013_g2013<-round(summary(clust.param$MinPts[clust.param$Year==2013 & clust.param$ID %in% group2013]))
+eps_space_2013_g2013<-round(summary(clust.param$EpsSpace[clust.param$Year==2013 & clust.param$ID %in% group2013]))
+eps_time_2013_g2013<-round(summary(clust.param$EpsTime[clust.param$Year==2013 & clust.param$ID %in% group2013]))
 
 
-#Spawn
-min_pts_spawn<-round(summary(clust.param$MinPts[clust.param$Season=="SPAWN"]))
-eps_space_spawn<-round(summary(clust.param$EpsSpace[clust.param$Season=="SPAWN"]))
-eps_time_spawn<-round(summary(clust.param$EpsTime[clust.param$Season=="SPAWN"]))
+
+#2014
+min_pts_2014<-round(summary(clust.param$MinPts[clust.param$Year==2014]))
+eps_space_2014<-round(summary(clust.param$EpsSpace[clust.param$Year==2014]))
+eps_time_2014<-round(summary(clust.param$EpsTime[clust.param$Year==2014]))
+
+#2014 - group 2012
+min_pts_2014_g2012<-round(summary(clust.param$MinPts[clust.param$Year==2014 & clust.param$ID %in% group2012]))
+eps_space_2014_g2012<-round(summary(clust.param$EpsSpace[clust.param$Year==2014 & clust.param$ID %in% group2012]))
+eps_time_2014_g2012<-round(summary(clust.param$EpsTime[clust.param$Year==2014 & clust.param$ID %in% group2012]))
+
+#2014 - group 2014
+min_pts_2014_g2014<-round(summary(clust.param$MinPts[clust.param$Year==2014 & clust.param$ID %in% group2014]))
+eps_space_2014_g2014<-round(summary(clust.param$EpsSpace[clust.param$Year==2014 & clust.param$ID %in% group2014]))
+eps_time_2014_g2014<-round(summary(clust.param$EpsTime[clust.param$Year==2014 & clust.param$ID %in% group2014]))
 
 
-cluster<-data.frame(Season=season,
-                    Min_Pts_Mean=c(min_pts_spring[["Mean"]],min_pts_summer[["Mean"]],min_pts_spawn[["Mean"]]),
-                    Min_Pts_Min=c(min_pts_spring[["Min."]],min_pts_summer[["Min."]],min_pts_spawn[["Min."]]),
-                    Min_Pts_Max=c(min_pts_spring[["Max."]],min_pts_summer[["Max."]],min_pts_spawn[["Max."]]),
+
+
+#summarize all cluster parameters
+cluster<-data.frame(Year=sort(rep(year,4)),
+                    Group=rep(c("All","Group 2012","Group 2013","Group 2014"),3),
                     
-                    Eps_Space_Mean=c(eps_space_spring[["Mean"]],eps_space_summer[["Mean"]],eps_space_spawn[["Mean"]]),
-                    Eps_Space_Min=c(eps_space_spring[["Min."]],eps_space_summer[["Min."]],eps_space_spawn[["Min."]]),
-                    Eps_Space_Max=c(eps_space_spring[["Max."]],eps_space_summer[["Max."]],eps_space_spawn[["Max."]]),
+                    Min_Pts_Median=c(min_pts_2012[["Median"]],min_pts_2012[["Median"]],"","",
+                                     min_pts_2013[["Median"]],min_pts_2013_g2012[["Median"]],
+                                     min_pts_2013_g2013[["Median"]],"",
+                                     min_pts_2014[["Median"]],min_pts_2014_g2012[["Median"]],"",
+                                     min_pts_2014_g2014[["Median"]]),
                     
-                    Eps_Time_Mean=c(eps_time_spring[["Mean"]],eps_time_summer[["Mean"]],eps_time_spawn[["Mean"]]),
-                    Eps_Time_Min=c(eps_time_spring[["Min."]],eps_time_summer[["Min."]],eps_time_spawn[["Min."]]),
-                    Eps_Time_Max=c(eps_time_spring[["Max."]],eps_time_summer[["Max."]],eps_time_spawn[["Max."]])
+                    Min_Pts_Mean=c(min_pts_2012[["Mean"]],min_pts_2012[["Mean"]],"","",
+                                     min_pts_2013[["Mean"]],min_pts_2013_g2012[["Mean"]],
+                                     min_pts_2013_g2013[["Mean"]],"",
+                                     min_pts_2014[["Mean"]],min_pts_2014_g2012[["Mean"]],"",
+                                     min_pts_2014_g2014[["Mean"]]),
+                    
+                    Min_Pts_Min=c(min_pts_2012[["Min."]],min_pts_2012[["Min."]],"","",
+                                  min_pts_2013[["Min."]],min_pts_2013_g2012[["Min."]],min_pts_2013_g2013[["Min."]],"",
+                                  min_pts_2014[["Min."]],min_pts_2014_g2012[["Min."]],"",min_pts_2014_g2014[["Min."]]),
+                    
+                    Min_Pts_Max=c(min_pts_2012[["Max."]],min_pts_2012[["Max."]],"","",
+                                  min_pts_2013[["Max."]],min_pts_2013_g2012[["Max."]],min_pts_2013_g2013[["Max."]],"",
+                                  min_pts_2014[["Max."]],min_pts_2014_g2012[["Max."]],"",min_pts_2014_g2014[["Max."]]),
+                    
+                    Eps_Space_Median=c(eps_space_2012[["Median"]],eps_space_2012[["Median"]],"","",
+                                       eps_space_2013[["Median"]],eps_space_2013_g2012[["Median"]],
+                                       eps_space_2013_g2013[["Median"]],"",
+                                       eps_space_2014[["Median"]],eps_space_2014_g2012[["Median"]],"",
+                                      eps_space_2014_g2014[["Median"]]),
+                    
+                    Eps_Space_Mean=c(eps_space_2012[["Mean"]],eps_space_2012[["Mean"]],"","",
+                                       eps_space_2013[["Mean"]],eps_space_2013_g2012[["Mean"]],
+                                       eps_space_2013_g2013[["Mean"]],"",
+                                       eps_space_2014[["Mean"]],eps_space_2014_g2012[["Mean"]],"",
+                                       eps_space_2014_g2014[["Mean"]]),
+                    
+                    Eps_Space_Min=c(eps_space_2012[["Min."]],eps_space_2012[["Min."]],"","",
+                                    eps_space_2013[["Min."]],eps_space_2013_g2012[["Min."]],
+                                    eps_space_2013_g2013[["Min."]],"",
+                                    eps_space_2014[["Min."]],eps_space_2014_g2012[["Min."]],"",
+                                    eps_space_2014_g2014[["Min."]]),
+                    
+                    Eps_Space_Max=c(eps_space_2012[["Max."]],eps_space_2012[["Max."]],"","",
+                                    eps_space_2013[["Max."]],eps_space_2013_g2012[["Max."]],
+                                    eps_space_2013_g2013[["Max."]],"",
+                                    eps_space_2014[["Max."]],eps_space_2014_g2012[["Max."]],"",
+                                    eps_space_2014_g2014[["Max."]]),
+                    
+                    Eps_Time_Median=c(eps_time_2012[["Median"]],eps_time_2012[["Median"]],"","",
+                                      eps_time_2013[["Median"]],eps_time_2013_g2012[["Median"]],
+                                      eps_time_2013_g2013[["Median"]],"",
+                                      eps_time_2014[["Median"]],eps_time_2014_g2012[["Median"]],"",
+                                      eps_time_2014_g2014[["Median"]]),
+                    
+                    Eps_Time_Mean=c(eps_time_2012[["Mean"]],eps_time_2012[["Mean"]],"","",
+                                      eps_time_2013[["Mean"]],eps_time_2013_g2012[["Mean"]],
+                                      eps_time_2013_g2013[["Mean"]],"",
+                                      eps_time_2014[["Mean"]],eps_time_2014_g2012[["Mean"]],"",
+                                      eps_time_2014_g2014[["Mean"]]),
+                    
+                    Eps_Time_Min=c(eps_time_2012[["Min."]],eps_time_2012[["Min."]],"","",
+                                   eps_time_2013[["Min."]],eps_time_2013_g2012[["Min."]],
+                                   eps_time_2013_g2013[["Min."]],"",
+                                   eps_time_2014[["Min."]],eps_time_2014_g2012[["Min."]],"",
+                                   eps_time_2014_g2014[["Min."]]),
+                    
+                    Eps_Time_Max=c(eps_time_2012[["Max."]],eps_time_2012[["Max."]],"","",
+                                   eps_time_2013[["Max."]],eps_time_2013_g2012[["Max."]],
+                                   eps_time_2013_g2013[["Max."]],"",
+                                   eps_time_2014[["Max."]],eps_time_2014_g2012[["Max."]],"",
+                                   eps_time_2014_g2014["Max."])
 )
 
-min_pts<-min_pts_spawn[["Mean"]]
-eps_space<-eps_space_spawn[["Mean"]]
-eps_time<-eps_time_spawn[["Mean"]]
+#define cluster parameters taken as mean of new groups 2012 group and 2013 group
+#2012 group data deteriorates over time and 2014 tags have different settings than 2012 and 2013 groups
+min_pts<-mean(min_pts_2012[["Mean"]],min_pts_2013_g2013[["Mean"]])
+eps_space<-mean(eps_space_2012[["Mean"]],eps_space_2013_g2013[["Mean"]])
+eps_time<-mean(eps_time_2012[["Mean"]],eps_time_2013_g2013[["Mean"]])
 
 
-for(ii in 1:length(tag)){
-  fishi<-fish[fish$TRANSMITTER==tag[ii],]
-  fishi<-fishi[order(fishi$DATETIME),]
-  x=fishi$UTM.X
-  y=fishi$UTM.Y
-  t=fishi$DATETIME
-  clust<-stdbscan(lon=x, lat=y, time=t, eps_space=eps_space, eps_time=eps_time, deltaE=2,SD=TRUE,MinPts=min_pts)
+
+ 
+#CREATE CLUSTERS
+year<-unique(fish$YEAR)
+
+#Loop for each year
+for(i in 1:length(year)){
   
-  print(clust)
-  print(paste0("Progress = ", round((ii/length(tag))*100),"%"))
-  print(tag[ii])
-  fishi$CLUSTER<-clust$cluster
-  assign(paste("LT",substr(tag[ii],start=4,stop=5),sep=""),fishi)
-  assign(paste("clusterLT",substr(tag[ii],start=4,stop=5),sep=""),clust)
+  #extract year specific data
+  fishy<-fish[fish$YEAR==year[i],]
+ 
+   #extract year specific tags
+  if(year[i]==2012){
+    tag<-good2012
+  }else if (year[i]==2013){
+    tag<-good2013
+  }else
+    tag<-good2014
+  #loop for each good tag in each year
+  for(ii in 1:length(tag)){
+    #extract data for specific tag within given year
+    fishi<-fishy[fishy$TRANSMITTER==tag[ii],]
+    #order data by timestamp
+    fishi<-fishi[order(fishi$DATETIME),]
+    #extract variables for stdbscan function
+    x=fishi$UTM.X
+    y=fishi$UTM.Y
+    t=fishi$DATETIME
+    #run stdbscan function
+    clust<-stdbscan(lon=x, lat=y, time=t, eps_space=eps_space, eps_time=eps_time, deltaE=2,SD=TRUE,MinPts=min_pts)
+    
+    #print status of running process: year  - progress % within year - tag ID 
+    print(year[i])
+    #print(clust)
+    print(paste0("Progress = ", round((ii/length(tag))*100),"%"))
+    print(tag[ii])
+    #assign cluster id 
+    fishi$CLUSTER<-clust$cluster
+    assign(paste("LT",substr(tag[ii],start=4,stop=5),"y",year[i],sep=""),fishi)
+    assign(paste("clusterLT",substr(tag[ii],start=4,stop=5),"y",year[i],sep=""),clust)
+  }
 }
 
-fishlist<-list(LT31,LT32,LT33,LT34,LT35,LT37,LT38,LT40,LT41,LT43,LT44)
+fishlist<-list(LT1y2012,LT2y2012,LT3y2012,LT4y2012,LT5y2012,
+               LT7y2012,LT8y2012,LT9y2012,LT10y2012,LT11y2012,
+               LT12y2012,LT13y2012,LT14y2012,LT15y2012,LT16y2012,
+               LT17y2012, LT18y2012, LT19y2012, LT20y2012, LT21y2012,
+               LT22y2012, LT24y2012, LT25y2012, LT26y2012, LT27y2012, 
+               LT28y2012, LT29y2012, LT30y2012, LT1y2013, L2y2013, 
+               LT3y2013, LT5y2013, LT7y2013, LT8y2013, LT9y2013,
+               LT13y2013, LT14y2013, LT15y2013, LT17y2013, LT18y2013,
+               LT19y2013, LT21y2013, LT22y2013, LT26y2013, LT28y2013,
+               LT29y2013, LT30y2013, LT31y2013, LT32y2013, LT33y2013, 
+               LT34y2013, LT35y2013, LT37y2013, LT40y2013, LT41y2013,
+               LT43y2013, LT44y2013,LT1y2014,LT2y2014, LT3y2014,
+               LT8y2014, LT9y2014, LT13y2014, LT14y2014, LT15y2014,
+               LT17y2014, LT18y2014, LT19y2014, LT22y2014, LT26y2014,
+               LT29y2014, LT30y2014, LT45y2014, LT46y2014, LT47y2014)
+
+
+
+
+               ,LT32,LT33,LT34,LT35,LT37,LT38,LT40,LT41,LT43,LT44)
 rm(LT31,LT32,LT33,LT34,LT35,LT37,LT38,LT40,LT41,LT43,LT44)
 rm(fishi)
 
