@@ -390,30 +390,14 @@ for(i in 1:length(year)){
   }
 }
 
-fishlist<-list(LT1y2012,LT2y2012,LT3y2012,LT4y2012,LT5y2012,
-               LT7y2012,LT8y2012,LT9y2012,LT10y2012,LT11y2012,
-               LT12y2012,LT13y2012,LT14y2012,LT15y2012,LT16y2012,
-               LT17y2012, LT18y2012, LT19y2012, LT20y2012, LT21y2012,
-               LT22y2012, LT24y2012, LT25y2012, LT26y2012, LT27y2012, 
-               LT28y2012, LT29y2012, LT30y2012, LT1y2013, L2y2013, 
-               LT3y2013, LT5y2013, LT7y2013, LT8y2013, LT9y2013,
-               LT13y2013, LT14y2013, LT15y2013, LT17y2013, LT18y2013,
-               LT19y2013, LT21y2013, LT22y2013, LT26y2013, LT28y2013,
-               LT29y2013, LT30y2013, LT31y2013, LT32y2013, LT33y2013, 
-               LT34y2013, LT35y2013, LT37y2013, LT40y2013, LT41y2013,
-               LT43y2013, LT44y2013,LT1y2014,LT2y2014, LT3y2014,
-               LT8y2014, LT9y2014, LT13y2014, LT14y2014, LT15y2014,
-               LT17y2014, LT18y2014, LT19y2014, LT22y2014, LT26y2014,
-               LT29y2014, LT30y2014, LT45y2014, LT46y2014, LT47y2014)
 
 
+fishlist = lapply(ls()[grep("(?<!cluster)LT",ls(),perl=TRUE)], get)
+clustlist = lapply(ls()[grep("clusterLT",ls())], get)
 
-
-               ,LT32,LT33,LT34,LT35,LT37,LT38,LT40,LT41,LT43,LT44)
-rm(LT31,LT32,LT33,LT34,LT35,LT37,LT38,LT40,LT41,LT43,LT44)
 rm(fishi)
 
-unique(fish$TRANSMITTER)
+
 #need spawn_pts and egg_pts from All Spawn Sites.R
 
 #spawnpoly<-gBuffer(spawn_pts,byid=TRUE,width=20)
@@ -423,7 +407,7 @@ for(i in 1:length(fishlist)){
   fishi=fishlist[[i]]
   xy<-SpatialPoints(cbind(fishi$UTM.X,fishi$UTM.Y))
   plot(shore_outline)
-  title(tag[i])
+  title(fishi$TRANSMITTER[1])
   
   lines(fishi$UTM.X,fishi$UTM.Y,col=rgb(0,0,0,0.2),pch=19,cex=0.2)
   points(xy,col=rgb(0,0,0,0.2),pch=19,cex=0.02)
