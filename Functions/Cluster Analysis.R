@@ -395,447 +395,227 @@ for(i in 1:length(year)){
 fishlist = lapply(ls()[grep("(?<!cluster)LT",ls(),perl=TRUE)], get)
 clustlist = lapply(ls()[grep("clusterLT",ls())], get)
 
+#remove individual data frames that are not needed
 rm(fishi)
-
+rm(list=ls()[grep("(?<!cluster)LT",ls(),perl=TRUE)])
+rm(list=ls()[grep("clusterLT",ls())])
 
 #need spawn_pts and egg_pts from All Spawn Sites.R
+#egg_pts<-read.csv("~/Data/GIS/eggsites.csv")
 
-#spawnpoly<-gBuffer(spawn_pts,byid=TRUE,width=20)
+#Load spawning site locations (both egg present and unknown)
+spawn_pts<-read.csv("~/Data/GIS/spawnsites.csv")
+#create spatial points and project them
+coordinates(spawn_pts)<-~UTM.X+UTM.Y
+proj4string(spawn_pts)<-CRS("+proj=utm +zone=11 +ellps=WGS84")
+
+#Create 20m buffer around points
+spawnpoly<-gBuffer(spawn_pts,byid=TRUE,width=20)
+
+#add year and 0 cluster break
 
 for(i in 1:length(fishlist)){
   spawnclust=NULL
   fishi=fishlist[[i]]
   xy<-SpatialPoints(cbind(fishi$UTM.X,fishi$UTM.Y))
   plot(shore_outline)
-  title(fishi$TRANSMITTER[1])
+  year<-fishi$YEAR[[1]]
+  tag<-fishi$TRANSMITTER[1]
+  title(paste(year,tag,sep=" "))
   
   lines(fishi$UTM.X,fishi$UTM.Y,col=rgb(0,0,0,0.2),pch=19,cex=0.2)
   points(xy,col=rgb(0,0,0,0.2),pch=19,cex=0.02)
-  
-  for(ii in 1:max(fishi$CLUSTER)){
-    new.xy<-xy[fishi$CLUSTER==ii]
-    #clusters must have a median point distance < 40 m from shore and median depth < 5 m
-    #if(median(fishi$SHOREDIST[fishi$CLUSTER==ii],na.rm=TRUE)<40 & median(fishi$DEPTH[fishi$CLUSTER==ii],na.rm=TRUE)<5){
-    #if(length(new.xy)>=8){
-    colour<-"red"
-    cp=mcp(new.xy,percent=100)
-    #cp1=gBuffer(cp, width=50.0, quadsegs=5, capStyle="SQUARE",
-    #       joinStyle="MITRE", mitreLimit=1.0)
-    #plot(cp1,add=T,col=colour+1)
-    plot(cp,add=TRUE,col=colour)
-    spawnclust2<-data.frame(CLUSTER=ii,
-                            X=mean(cp@bbox[1,c(1,2)]),
-                            Y=mean(cp@bbox[2,c(1,2)]),
-                            AREA=gArea(cp),
-                            SPAWNSITE=ifelse(any(gOverlaps(cp,spawnpoly, byid=TRUE)),1,0),
-                            EGGS=ifelse(any(gOverlaps(cp,spawnpoly[spawnpoly$EGGS==1,], byid=TRUE)),1,0))
-    spawnclust<-rbind(spawnclust,spawnclust2)
-    
-    #}
-    #}
+  if (max(fishi$CLUSTER)>0){
+    for(ii in 1:max(fishi$CLUSTER)){
+      new.xy<-xy[fishi$CLUSTER==ii]
+      colour<-"red"
+      cp=mcp(new.xy,percent=100)
+      
+      plot(cp,add=TRUE,col=colour)
+      
+      spawnclust2<-data.frame(TRANSMITTER=tag,
+                              YEAR=year,
+                              CLUSTER=ii,
+                              X=mean(cp@bbox[1,c(1,2)]),
+                              Y=mean(cp@bbox[2,c(1,2)]),
+                              AREA=gArea(cp),
+                              SPAWNSITE=ifelse(any(gOverlaps(cp,spawnpoly, byid=TRUE)),1,0),
+                              EGGS=ifelse(any(gOverlaps(cp,spawnpoly[spawnpoly$EGGS==1,], byid=TRUE)),1,0))
+      
+      spawnclust<-rbind(spawnclust,spawnclust2)
+      
+    }
+    assign(paste("spawnclustLT",substr(tag,start=4,stop=5),"y",year,sep=""),spawnclust)
   }
-  assign(paste("spawnclustLT",substr(tag[i],start=4,stop=5),sep=""),spawnclust)
+
 }
 
+#Create a cluster list NOTE 72 out of 75 create a cluster 
+clustlist<-lapply(ls()[grep("spawnclustLT",ls())], get)
+#remove individual data.frames
+rm(list=ls()[grep("spawnclust",ls())])
 
-#cluster list; NOTE:LT32 never spawns
-clustlist<-list(spawnclustLT31,spawnclustLT32,spawnclustLT33,spawnclustLT34,spawnclustLT35,spawnclustLT37,spawnclustLT38,spawnclustLT40,spawnclustLT41,spawnclustLT43,spawnclustLT44)
-rm(spawnclustLT31,spawnclustLT32,spawnclustLT33,spawnclustLT34,spawnclustLT35,spawnclustLT37,spawnclustLT38,spawnclustLT40,spawnclustLT41,spawnclustLT43,spawnclustLT44)
 
-##### param graphs ####
-#split fish into months
-#select spring data 2 days after the last surgery
-fishspring<-fish[fish$SEASON=="SPRING" & fish$DAY>15,]
-#select summer data
-fishsummer<-fish[fish$SEASON=="SUMMER",]
-
-#select spawn data (no october)
-fishspawn<-fish[fish$SEASON=="SPAWN" & fish$MONTH<10,]
-
-fishspawn$SEX<-as.factor(fishspawn$SEX)
-
-save(fish,fishspawn,shore_outline,depth15,file="fishspawn.RData")
-
-#Spawn
-quartz()
-plot(shore_outline,main="Lake trout spawn, 2013")
-points(UTM.Y~UTM.X,data=fishspawn[fishspawn$SEX=="F",],col=rgb(1,0,0,0.1),pch=19,cex=0.1)
-points(UTM.Y~UTM.X,data=fishspawn[fishspawn$SEX=="M",],col=rgb(0,0,1,0.1),pch=19,cex=0.1)
-
-acc<-fishspawn$ACCEL[!is.na(fishspawn$ACCEL)]
-sacc<-ltspawnclust3$ACCEL
-ltspawnclust3$SEX<-as.factor(ltspawnclust3$SEX)
-ltspawnclust3$SPAWN<-as.factor(ltspawnclust3$SPAWN)
-
-
-shapiro.test(ltspawnclust3$ACCEL)
-bartlett.test(ltspawnclust3$ACCEL,ltspawnclust3$SPAWN)
-t.test(ltspawnclust3$ACCEL~ltspawnclust3$SEX)
-
-sex<-unique(fishspawn$SEX)
-means<-c(mean(fishspawn$ACCEL[!is.na(fishspawn$ACCEL) & fishspawn$SEX=="M"]),mean(fishspawn$ACCEL[!is.na(fishspawn$ACCEL) & fishspawn$SEX=="F"]))
-sds<-c(sd(fishspawn$ACCEL[!is.na(fishspawn$ACCEL) & fishspawn$SEX=="M"]),sd(fishspawn$ACCEL[!is.na(fishspawn$ACCEL) & fishspawn$SEX=="F"]))
-acc<-data.frame(SEX=as.factor(sex),
-                MEAN=means,
-                SD=sds
-)
-
-
-plot(acc$SEX,acc$MEAN,type="h")
-
-arrows(MEAN+SD,mean,data=fishspawn[!is.na(fishspawn$ACCEL),])
-
-
-chisq.test(table(ltspawnclust3$SEX))
-
-hist(log(acc))
-
-ks.test(log(acc),"pnorm")
-bartlett.test(log(acc),fishspawn$SEX[!is.na(fishspawn$ACCEL)])
-
-#t.test(acc~fishspawn$SEX[!is.na(fishspawn$ACCEL)])
-wilcox.test(acc~fishspawn$SEX[!is.na(fishspawn$ACCEL)])
-
-#Nearshore
-
-
-## calculate the density - don't plot yet
-
-densALL<-density(fishspawn$SHOREDIST, from=0)
-densFemale_Spawn <- density(fishspawn$SHOREDIST[fishspawn$SEX=="F"],from=0, bw = densALL$bw)
-densMale_Spawn<- density(fishspawn$SHOREDIST[fishspawn$SEX=="M"],from=0, bw = densALL$bw)
-
-
-## calculate the range of the graph
-xlim <- range(0,450)
-ylim <- range(0,0.012)
-#pick the colours
-FemaleCol <- rgb(1,0,0,0.5)
-MaleCol <- rgb(0,0,1,0.5)
-## plot the carrots and set up most of the plot parameters
-plot(densFemale_Spawn, xlim = xlim, ylim = ylim, 
-     xlab = 'Distance to Shore',
-     main="",
-     type="n",
-     bty="n",
-     axes=FALSE
-)
-
-#put our density plots in
-polygon(c(densMale_Spawn$x,rev(densMale_Spawn$x)),c(densMale_Spawn$y,rep(0,512)), density = -1, col = MaleCol, border = "blue")
-polygon(c(densFemale_Spawn$x,rev(densFemale_Spawn$x)),c(densFemale_Spawn$y,rep(0,512)), density = -1, col = FemaleCol, border = "red")
-
-
-
-# Draw our own x-axis
-axis(1,pos=0)
-axis(1,at=xlim,labels=c("",""),pos=0,lwd.ticks=0)
-
-axis(2,las=1,pos=0)
-
-
-## add a legend in the corner
-legend("topright",c('Male', "Female"),
-       fill = c(MaleCol,FemaleCol), bty = 'n',
-       border = NA)
-
-abline(v=50)
-mtext("50",side=1,line=0.5,at=50)
-
-#Depth 
-
-quartz()
-par(mfrow=c(2,1))
-par(mar=c(0,4.1,4.1,2.1))
-#5.1 4.1 4.1 2.1
-#males
-plot(DEPTH~DATETIME,data=fish[fish$DATETIME>="2013-08-15",],
-     main="",
-     xlab="",
-     ylab="",
-     type="n",
-     bty="n",
-     axes=FALSE,
-     ylim=c(32,0))
-
-#axis.POSIXct(1,at=c(as.POSIXct("2013-08-15", tz="MST"),as.POSIXct("2013-09-01",tz="MST") ,as.POSIXct("2013-09-15", tz="MST"),as.POSIXct("2013-10-01", tz="MST"),as.POSIXct("2013-10-15", tz="MST")), format="%d %b")
-
-axis(2,
-     las=1
-)
-     #pos=as.numeric(as.POSIXct("2013-08-15", tz="MST")))
-box()
-
-
-
-
-points(DEPTH~DATETIME,data=fish[fish$DATETIME>="2013-08-15" & fish$SEX=="M",],
-       col=rgb(0,0,1,0.1),pch=15)
-lines(depth15$Date,depth15$Depth,lwd=4)
-text(as.numeric(as.POSIXct("2013-08-14", tz="MST")),0.5,"(A)", font=2)
-
-#females
-par(mar=c(5.1,4.1,0,2.1))
-plot(DEPTH~DATETIME,data=fish[fish$DATETIME>="2013-08-15",],
-     main="",
-     xlab="",
-     ylab="",
-     type="n",
-     bty="n",
-     axes=FALSE,
-     ylim=c(32,0))
-
-axis.POSIXct(1,at=c(as.POSIXct("2013-08-15", tz="MST"),as.POSIXct("2013-09-01",tz="MST") ,as.POSIXct("2013-09-15", tz="MST"),as.POSIXct("2013-10-01", tz="MST"),as.POSIXct("2013-10-15", tz="MST")),
-             format="%d %b")
-
-axis(2,
-     las=1)
-box()
-
-points(DEPTH~DATETIME,data=fish[fish$DATETIME>="2013-08-15" & fish$SEX=="F",],
-       col=rgb(1,0,0,0.1),pch=15)
-lines(depth15$Date,depth15$Depth,lwd=4)
-text(as.numeric(as.POSIXct("2013-08-14", tz="MST")),0.5,"(B)", font=2)
-mtext("Depth (m)", side=2, line=3, adj=1.2)
-
-
-#Actual Depth
-
-library(ks)
-
-## calculate the density - don't plot yet
-densFemale_Spawn <- density(fishspawn$DEPTH[fishspawn$SEX=="F"],from=0, na.rm=TRUE)
-densMale_Spawn<- density(fishspawn$DEPTH[fishspawn$SEX=="M"],from=0, na.rm=TRUE)
-
-densFemale_Spawn$bw
-densFemale_Spawn$n
-
-densMale_Spawn$bw
-densMale_Spawn$n
-
-## calculate the range of the graph
-xlim <- range(0,32)
-ylim <- range(0,0.2)
-#pick the colours
-FemaleCol <- rgb(1,0,0,0.5)
-MaleCol <- rgb(0,0,1,0.5)
-## plot the carrots and set up most of the plot parameters
-plot(densMale_Spawn, xlim = xlim, ylim = ylim, 
-     xlab = 'Depth',
-     main="",
-     type="n",
-     bty="n",
-     axes=FALSE
-)
-
-#put our density plots in
-polygon(c(densMale_Spawn$x,rev(densMale_Spawn$x)),c(densMale_Spawn$y,rep(0,512)), density = -1, col = MaleCol, border = "blue")
-polygon(c(densFemale_Spawn$x,rev(densFemale_Spawn$x)),c(densFemale_Spawn$y,rep(0,512)), density = -1, col = FemaleCol, border = "red")
-
-
-# Draw our own x-axis
-axis(1,pos=0)
-axis(1,at=xlim,labels=c("",""),pos=0,lwd.ticks=0)
-
-axis(2,las=1,pos=0)
-
-
-## add a legend in the corner
-legend("topright",c('Male', "Female"),
-       fill = c(MaleCol,FemaleCol), bty = 'n',
-       border = NA)
-
-abline(v=4)
-mtext("4",side=1,line=0.5,at=4)
-
-require(mixtools)
-fit<-normalmixEM(fishspawn$DEPTH[fishspawn$SEX=="M" & !is.na(fishspawn$DEPTH)],lambda=0.5,mu=c(2,12),sigma=5)
-
-#Depth Contour
-
-## calculate the density - don't plot yet
-densFemale_Spawn <- density(fishspawn$BOTTOMDEPTH[fishspawn$SEX=="F"],from=0)
-densMale_Spawn<- density(fishspawn$BOTTOMDEPTH[fishspawn$SEX=="M"],from=0)
-
-## calculate the range of the graph
-xlim <- range(0,32)
-ylim <- range(0,0.1)
-#pick the colours
-FemaleCol <- rgb(1,0,0,0.5)
-MaleCol <- rgb(0,0,1,0.5)
-## plot the carrots and set up most of the plot parameters
-plot(densMale_Spawn, xlim = xlim, ylim = ylim, 
-     xlab = 'Depth Contour',
-     main = "Lake Trout Spawn, 2013",
-     type="n",
-     bty="n",
-     axes=FALSE
-)
-
-#put our density plots in
-polygon(c(densMale_Spawn$x,rev(densMale_Spawn$x)),c(densMale_Spawn$y,rep(0,512)), density = -1, col = MaleCol, border = "blue")
-polygon(c(densFemale_Spawn$x,rev(densFemale_Spawn$x)),c(densFemale_Spawn$y,rep(0,512)), density = -1, col = FemaleCol, border = "red")
-
-
-# Draw our own x-axis
-axis(1,pos=0)
-axis(1,at=xlim,labels=c("",""),pos=0,lwd.ticks=0)
-
-axis(2,las=1,pos=0)
-
-
-## add a legend in the corner
-legend("topright",c('Male', "Female"),
-       fill = c(MaleCol,FemaleCol), bty = 'n',
-       border = NA)
-
-abline(v=4)
-mtext("4",side=1,line=0.5,at=4)
-
-
-
-#Depth Above Bottom
-
-## calculate the density - don't plot yet
-densFemale_Spawn<- density(fishspawn$OFFBOTTOM[fishspawn$SEX=="F"],from=0,to=32,na.rm=TRUE)
-
-densMale_Spawn<-density(fishspawn$OFFBOTTOM[fishspawn$SEX=="M"],from=0,to=32,na.rm=TRUE)
-## calculate
-
-## calculate the range of the graph
-xlim <- range(0,32)
-ylim <- range(0,0.15)
-#pick the colours
-FemaleCol <- rgb(1,0,0,0.5)
-MaleCol <- rgb(0,0,1,0.5)
-## plot the carrots and set up most of the plot parameters
-plot(densMale_Spawn, xlim = xlim, ylim = ylim, 
-     xlab = 'Depth Above Bottom',
-     main = "Lake Trout Spawn, 2013",
-     type="n",
-     bty="n",
-     axes=FALSE
-)
-
-#put our density plots in
-polygon(c(densMale_Spawn$x,rev(densMale_Spawn$x)),c(densMale_Spawn$y,rep(0,512)), density = -1, col = MaleCol, border = "blue")
-polygon(c(densFemale_Spawn$x,rev(densFemale_Spawn$x)),c(densFemale_Spawn$y,rep(0,512)), density = -1, col = FemaleCol, border = "red")
-
-
-# Draw our own x-axis
-axis(1,pos=0)
-axis(1,at=xlim,labels=c("",""),pos=0,lwd.ticks=0)
-
-axis(2,las=1,pos=0)
-
-
-## add a legend in the corner
-legend("topright",c('Male', "Female"),
-       fill = c(MaleCol,FemaleCol), bty = 'n',
-       border = NA)
-
-abline(v=3)
-mtext("3",side=1,line=0.5,at=3)
-
-#####
-
-
-
+#Spawn cluster filter
+#create new dataframe for lake trout cluster data
 ltspawnclust<-NULL
 
-for(i in 1:length(fishlist)){
-  fishi=fishlist[[i]]
+#assign "year tag" name to each list object 
+fishlist<-setNames(fishlist,lapply(fishlist, function(x) paste0(x$YEAR[1],x$TRANSMITTER[1])))
+
+#vector of accel "year tag" names
+acceltag<-paste0(rep(2013,14),"LT-",c(31:44))
+#find accel tags in fishlist
+acceltag<-names(fishlist)[names(fishlist) %in% acceltag]
+
+#determine accel cutoff
+fishbind<-do.call(rbind,fishlist[acceltag])
+
+#mean ACCEL+2 sd =accel of 1.3
+accel_cut<-mean(fishbind$ACCEL[fishbind$DATETIME>="2013-08-30" 
+                               & fishbind$DATETIME<"2013-10-01" 
+                               & fishbind$CLUSTER!=0], na.rm=TRUE) +
+                2 * (sd(fishbind$ACCEL[fishbind$DATETIME>="2013-08-30" 
+                                       & fishbind$DATETIME<"2013-10-01" 
+                                       & fishbind$CLUSTER!=0],na.rm=TRUE))
+
+
+for(i in 1:length(clustlist)){
   
+  #extract clustlist object
   spawnclust=clustlist[[i]]
+  
+  #determine year and tag ID
+  tag=spawnclust$TRANSMITTER[1]
+  year=spawnclust$YEAR[1]
+  yeartag=paste0(year,tag)
+  
+  #Extract matching position data
+  fishi=fishlist[[yeartag]]
+  
   if(length(spawnclust$CLUSTER)>0){
+    #extract fish posiiton data inside a cluster
     fishi<-fishi[fishi$CLUSTER %in% spawnclust$CLUSTER,]
     
-    
+    #create cluster summary
     for(ii in 1: length(spawnclust$CLUSTER)){
       fishi2<-fishi[fishi$CLUSTER==spawnclust$CLUSTER[ii],]
       ltspawnclust2<-data.frame(TRANSMITTER=fishi2$TRANSMITTER[1],
+                                YEAR=fishi2$YEAR[1],
                                 CLUSTER=spawnclust$CLUSTER[ii],
+                                #centre position of cluster
                                 CLUST.X=spawnclust$X[ii],
                                 CLUST.Y=spawnclust$Y[ii],
+                                #area of cluster
                                 AREA=spawnclust$AREA[ii],
+                                #binary if it overlaps a possible spawning site; 1 = true
                                 SPAWNSITE=spawnclust$SPAWNSITE[ii],
+                                #binary if it overlaps a spawn site with eggs present; 1 = true
                                 EGGS=spawnclust$EGGS[ii],
+                                #start of cluster
                                 STARTTIME=min(fishi2$DATETIME),
+                                #duration of cluster
                                 TOTALTIME=as.numeric(difftime(max(fishi2$DATETIME),min(fishi2$DATETIME),units="mins")),
+                                #mean depth of fish in cluster
                                 DEPTH=mean(fishi2$DEPTH,na.rm=TRUE),
+                                #min depth of fish in cluster
                                 MINDEPTH=min(fishi2$DEPTH,na.rm=TRUE),
+                                #max depth of fish in cluster
                                 MAXDEPTH=max(fishi2$DEPTH,na.rm=TRUE),
+                                #mean lake depth at fish posiitons
                                 BOTTOMDEPTH=mean(fishi2$BOTTOMDEPTH,na.rm=TRUE),
+                                #percent of positions at lake depths less than 4 meters
                                 PERCUNDER4M=length(fishi2$BOTTOMDEPTH[fishi2$BOTTOMDEPTH<4])/length(fishi2$BOTTOMDEPTH),
+                                #max lake depth at fish positions
                                 MAXBOTTOMDEPTH=max(fishi2$BOTTOMDEPTH,na.rm=TRUE),
+                                #min lake depth at fish positions
                                 MINBOTTOMDEPTH=min(fishi2$BOTTOMDEPTH,na.rm=TRUE),
+                                #mean distance of positions from shore
                                 SHOREDIST=mean(fishi2$SHOREDIST,na.rm=TRUE),
+                                #percent positions less than 50 meters from shore
                                 PERCUNDER50M=length(fishi2$SHOREDIST[fishi2$SHOREDIST<50])/length(fishi2$SHOREDIST),
+                                #mean acceleration of fish in cluster
                                 ACCEL=mean(fishi2$ACCEL,na.rm=TRUE),
+                                #max acceleration of fish in cluster
                                 MAXACCEL=max(fishi2$ACCEL,na.rm=TRUE),
-                                PERCOVERACCELCUT=length(fishi2$ACCEL[fishi2$ACCEL>1.3 & !is.na(fishi2$ACCEL)])/length(fishi2$ACCEL[!is.na(fishi2$ACCEL)])
+                                #percent over acceleration cutoff of 1.3 for positions in cluster
+                                PERCOVERACCELCUT=length(fishi2$ACCEL[fishi2$ACCEL>accel_cut & !is.na(fishi2$ACCEL)])/length(fishi2$ACCEL[!is.na(fishi2$ACCEL)])
       )
       ltspawnclust<-rbind(ltspawnclust,ltspawnclust2)
     }
-    assign(paste("spawnclustLT",substr(tag[i],start=4,stop=5),sep=""),fishi)
   }
 }
 
+#assign sex
+#U for unknown
 ltspawnclust$SEX<-"U"
+#M for male
 ltspawnclust$SEX[ltspawnclust$TRANSMITTER %in% male]<-"M"
+#F for female
 ltspawnclust$SEX[ltspawnclust$TRANSMITTER %in% female]<-"F"
 
 plot(shore_outline,main="All Clusters")
-points(CLUST.Y~CLUST.X,data=ltspawnclust,pch=19,cex=0.3)
+points(CLUST.Y~CLUST.X,data=ltspawnclust,pch=19,cex=0.3,col=rgb(0,0,1,0.1))
 #area_cut=mean(ltspawnclust$AREA)+2*sd(ltspawnclust$AREA)
 #data1=ltspawnclust[ltspawnclust$AREA<area_cut,]
 
 
-plot(shore_outline,main="Potenital Spawn Clusters")
+#plot(shore_outline,main="Potenital Spawn Clusters")
+#select data with >50 percent positions under 50 m distance to shore 
 data1=ltspawnclust[ltspawnclust$PERCUNDER50M>.50,]
-points(CLUST.Y~CLUST.X,data=data1,pch=19,col=rgb(1,0,0,0.3))
+#points(CLUST.Y~CLUST.X,data=data1,pch=19,col=rgb(1,0,0,0.3))
+
+#select data with >50 percent positions at a lake bottom depth of less than 4 m
 data2=data1[data1$PERCUNDER4M>.50,]
-points(CLUST.Y~CLUST.X,data=data2,pch=19,cex=0.5,col=rgb(0,0,1,1))
+#points(CLUST.Y~CLUST.X,data=data2,pch=19,cex=0.5,col=rgb(0,0,1,1))
 
-
+#create a new dataframe
 ltspawnclust2<-data2
+
+#Determine unique spawning sites ie. greater than 70 meters apart
 ltspawnclust2$SITE<-NA
 
-#same site spawning
-ltspawnclust3=NULL
-ctags<-unique(ltspawnclust2$TRANSMITTER)
-for(i in 1:length(ctags)){
-  clust<-ltspawnclust2[ltspawnclust2$TRANSMITTER==ctags[i],]
-  clusters<-unique(clust$CLUSTER)
-  for(ii in 1:length(clusters)){
-    clust2<-clust[clust$CLUSTER==clusters[ii],]
-    if(is.na(clust2$SITE)){
-      d<-pointDistance(clust2[,c("CLUST.X","CLUST.Y")],clust[,c("CLUST.X","CLUST.Y")],allpairs=TRUE,longlat=FALSE)
-      #the centre of clusters must be 70 m apart to be concidered "unique sites"
-      clust$SITE[d<70]<-ii
-    }
+#all unique sites
+for(i in 1:dim(ltspawnclust2)[1]){
+  if(is.na(ltspawnclust2$SITE[i])){
+    d<-pointDistance(ltspawnclust2[i,c("CLUST.X","CLUST.Y")],ltspawnclust2[,c("CLUST.X","CLUST.Y")],allpairs=TRUE,longlat=FALSE)
+    #the centre of clusters must be 70 m apart to be concidered "unique sites"
+    ltspawnclust2$SITE[d<70]<-i
   }
-  ltspawnclust3=rbind(clust,ltspawnclust3)
 }
 
-ltspawnclust3$HOUR<-hour(ltspawnclust3$STARTTIME)+minute(ltspawnclust3$STARTTIME)/60+second(ltspawnclust3$STARTTIME)/3600
-ltspawnclust3$DAY<-day(ltspawnclust3$STARTTIME)
-rownames(ltspawnclust3)<-seq(1,dim(ltspawnclust3)[1],by=1)
 
-fishbind<-do.call(rbind,fishlist)
+ltspawnclust<-ltspawnclust2
+rm(ltspawnclust2)
 
-#mean ACCEL+2 sd =accel of 1.3
-accel_cut<-mean(fishbind$ACCEL[fishbind$DATETIME>="2013-08-30" &fishbind$DATETIME<"2013-10-01" & fishbind$CLUSTER!=0],na.rm=TRUE)+2*(sd(fishbind$ACCEL[fishbind$DATETIME>="2013-08-30" &fishbind$DATETIME<"2013-10-01" & fishbind$CLUSTER!=0],na.rm=TRUE))
-ltspawnclust3$SPAWN<-0
-ltspawnclust3$SPAWN[ltspawnclust3$MAXACCEL>accel_cut]<-1
+ltspawnclust$SPAWN<-0
+ltspawnclust$SPAWN[ltspawnclust$MAXACCEL > accel_cut]<-1
+
+#add date time columns
+ltspawnclust$HOUR<-hour(ltspawnclust$STARTTIME)+minute(ltspawnclust$STARTTIME)/60+second(ltspawnclust$STARTTIME)/3600
+ltspawnclust$DAY<-day(ltspawnclust$STARTTIME)
+ltspawnclust$MONTH<-month(ltspawnclust$STARTTIME)
+#reorder rownames
+rownames(ltspawnclust)<-seq(1,dim(ltspawnclust)[1],by=1)
 
 #plots 6.15 x 4.76
 plot(shore_outline)
-points(CLUST.Y~CLUST.X,data=ltspawnclust3)
-points(CLUST.Y~CLUST.X,data=ltspawnclust3[ltspawnclust3$SPAWN==1,],pch=19,col=rgb(1,0,0,1))
-points(CLUST.Y~CLUST.X,data=ltspawnclust3[ltspawnclust3$SPAWNSITE==1,],pch=19,col=rgb(0,1,0,1))
-points(CLUST.Y~CLUST.X,data=ltspawnclust3[ltspawnclust3$EGGS==1,],pch=19,col=rgb(0,0,1,1))
+points(CLUST.Y~CLUST.X,data=ltspawnclust)
+points(CLUST.Y~CLUST.X,data=ltspawnclust[ltspawnclust$SPAWN==1,],pch=19,col=rgb(1,0,0,1))
+points(CLUST.Y~CLUST.X,data=ltspawnclust[ltspawnclust$SPAWNSITE==1,],pch=19,col=rgb(0,1,0,1))
+points(CLUST.Y~CLUST.X,data=ltspawnclust[ltspawnclust$EGGS==1,],pch=19,col=rgb(0,0,1,1))
 
+
+clust<-unlist(dimnames(table(ltspawnclust$SITE)[table(ltspawnclust$SITE)>50]))
+
+plot(table(ltspawnclust$SITE),type="h")
+
+plot(shore_outline)
+points(CLUST.Y~CLUST.X,data=ltspawnclust[ltspawnclust$SITE %in% clust,],col=YEAR)
+
+
+plot(shore_outline)
+points(CLUST.Y~CLUST.X,data=ltspawnclust[ltspawnclust$YEAR==2014,],pch=19,col=rgb(1,0,0,0.1))
 
 
 points(UTM.Y~UTM.X,data=spawn_pts,pch=19,cex=0.5,col="blue")

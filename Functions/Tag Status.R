@@ -18,3 +18,5 @@ plot(shore_outline, main="2014")
 points(UTM.Y~UTM.X,data=fish[fish$TRANSMITTER==tags[i] & 
                                fish$DATETIME>"2014-01-01",])
 i=i+1
+
+par(mfrow=c(1,1))

@@ -37,7 +37,7 @@ rm(all_data1,all_data2,all_data3,all_data4,all_data5,all_data6,all_data7,all_dat
 
 
 #load shoreline polygon and projection
-shore_outline<-readShapeSpatial("~//Data/GIS/Alexie.shp")
+shore_outline<-readShapeSpatial("~/Data/GIS/Alexie.shp")
 proj4string(shore_outline)<-CRS("+proj=utm +zone=11 +ellps=WGS84")
 
 
