@@ -1,0 +1,307 @@
+---
+title: "summary"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set( echo=FALSE, message=FALSE, warning=FALSE)
+library(printr)
+library(knitr)
+library(dplyr)
+load("SpawnClust.RData")
+```
+
+## Cluster Parameters
+
+```{r cluster_params}
+
+kable(cluster[,c(1,2,4,8,12)])
+```
+
+## Cluster Frequency over time
+
+
+```{r spawn_time, fig.height=11, fig.width= 8.5}
+
+
+
+spawn.num.12<-spawn.num[spawn.num$YEAR==2012,]
+spawn.num.13<-spawn.num[spawn.num$YEAR==2013,]
+spawn.num.14<-spawn.num[spawn.num$YEAR==2014,]
+
+
+peakdates<-function(date,freq){
+  
+  p<-data.frame(DATE=NULL,
+                COUNT=NULL,
+                DAYS=NULL)
+  
+  data<-data.frame(DATE=date,
+                    FREQ=freq)
+  
+  for(i in 1:dim(data)[1]){
+    data2<-data[i:dim(data)[1],]
+    c50<-sum(data$FREQ)*0.5
+    count<-sum(data2$FREQ[which(!cumsum(data2$FREQ)>c50)])
+    days<-length(which(!cumsum(data2$FREQ)>c50))
+    end<-dim(data2)[1]
+    
+    if(end>days){
+      if((count+data2$FREQ[days+1])>c50){
+        days=days
+      }else{
+        days=days=0
+      }
+      
+    }else{
+      days=0
+    }
+    p<-rbind(p,data.frame(DATE=data$DATE[i],COUNT=count,DAYS=days))
+  }
+  peak<-data.frame(START=min(p$DATE[p$DAYS==min(p$DAYS[p$DAYS>0])]),
+                   END=min(p$DATE[p$DAYS==min(p$DAYS[p$DAYS>0])])+min(p$DAYS[p$DAYS>0])*24*60*60)
+  print(peak)
+}
+
+peakdates.12<-peakdates(date=spawn.num.12$DATE,freq=spawn.num.12$FREQ)
+peakdates.13<-peakdates(date=spawn.num.13$DATE,freq=spawn.num.13$FREQ)
+peakdates.g13<-peakdates(date=spawn.num.13$DATE,freq=spawn.num.13$FREQ13)
+peakdates.14<-peakdates(date=spawn.num.14$DATE,freq=spawn.num.14$FREQ)
+peakdates.g14<-peakdates(date=spawn.num.14$DATE,freq=spawn.num.14$FREQ14)
+
+par(mfrow=c(3,1))
+
+#2012
+plot(FREQ/24~DATE,data=spawn.num.12,ylim=c(0,3),
+     xlim=as.POSIXct(c("2012-08-15","2012-10-15"),format="%Y-%m-%d", tz="MST"),type="h",col="grey",
+     lwd=6,lend=2)
+lines(c(peakdates.12$START-12*60*60,peakdates.12$START-12*60*60),c(-1,3.5))
+lines(c(peakdates.12$END+12*60*60,peakdates.12$END+12*60*60),c(-1,3.5))
+
+#2013 group 2013
+plot(FREQ13/9~DATE,data=spawn.num.13,ylim=c(0,3),
+     xlim=as.POSIXct(c("2013-08-15","2013-10-15"),format="%Y-%m-%d", tz="MST"), type="h",col="grey",
+     lwd=6,lend=2)
+lines(c(peakdates.g13$START-12*60*60,peakdates.g13$START-12*60*60),c(-1,3.5))
+lines(c(peakdates.g13$END+12*60*60,peakdates.g13$END+12*60*60),c(-1,3.5))
+
+#2014 group 2014
+plot(FREQ14/3~DATE,data=spawn.num.14,ylim=c(0,3),
+     xlim=as.POSIXct(c("2014-08-15","2014-10-15"),format="%Y-%m-%d", tz="MST"),type="h",col="grey",
+     lwd=6,lend=2)
+lines(c(peakdates.g14$START-12*60*60,peakdates.g14$START-12*60*60),c(-1,3))
+lines(c(peakdates.g14$END+12*60*60,peakdates.g14$END+12*60*60),c(-1,3))
+
+
+
+par(mfrow=c(1,1))
+
+
+```
+
+##Spawning Shoal Use
+
+```{r }
+
+
+library(mapplots)
+library(maptools)
+library(scales)
+
+
+data<-first.clust
+xyz<-make.xyz(x=data$CLUST.X,y=data$CLUST.Y,z=data$FREQ,group=data$YEAR)
+
+plot(shore_outline)
+  
+draw.pie(z=xyz$z, x=xyz$x, y=xyz$y, 
+        radius=100, col=c(alpha("blue", 0.8), alpha("red", 0.8), alpha("yellow", 0.8)),
+        border=c(alpha("blue", 0.8), alpha("red", 0.8), alpha("yellow", 0.8))) 
+
+text(650800,6954500, "Year",font=2) 
+legend.pie(650800,6954300, labels=c("2012","2013","2014"), radius = 100,
+           bty="n", col=c(alpha("blue", 0.8), alpha("red", 0.8), alpha("yellow", 0.8)),
+           border=c(alpha("blue", 0.8), alpha("red", 0.8), alpha("yellow", 0.8)),
+           label.dist=1.7)
+
+text(650800,6954000, "Frequency",font=2) 
+legend.bubble(650800,6953800, z=92, round=1, n=1, maxradius=100, bty="n",txt.col="transparent")
+text(650950,6953800, "92", cex=0.8) 
+legend.bubble(650800,6953625, z=46, round=1, n=1, maxradius=50, bty="n",txt.col="transparent")
+text(650900,6953625, "46", cex=0.7) 
+legend.bubble(650800,6953525, z=23, round=1, n=1, maxradius=25, bty="n",txt.col="transparent")
+text(650875,6953525,"23", cex=0.6) 
+legend.bubble(650800,6953462, z=12, round=1, n=1, maxradius=13, bty="n",txt.col="transparent")
+text(650862,6953462, "12", cex=0.5)               
+
+
+
+#determine max frequency
+max.all<-max(first.clust$FREQ)
+
+#2012
+data<-filter(first.clust,YEAR==2012)
+#determine scaling factor
+s=max(data$FREQ)/max.all
+
+plot(shore_outline, main=data$YEAR[1], col="grey90",border="grey70")
+
+draw.bubble(z=data$FREQ, x=data$CLUST.X, y=data$CLUST.Y, 
+         maxradius=200*s, col=alpha("lightblue", 0.3),pch=19)
+draw.bubble(z=data$FREQ, x=data$CLUST.X, y=data$CLUST.Y, 
+            maxradius=200*s, col=alpha("blue",0.3))
+
+
+legend.bubble(650800,6954000, z=max.all, round=1, n=3, maxradius=200, bty="n",pch=19,
+              col=alpha("lightblue",0.3), txt.cex = 0.7, txt.col="transparent")
+legend.bubble(650800,6954000, z=max.all, round=0, n=3, maxradius=200, bty="n",
+              col=alpha("blue",0.3),txt.cex = 0.7, txt.col = alpha("blue",0.3))
+
+
+#2013
+data<-filter(first.clust,YEAR==2013)
+#determine scaling factor
+s=max(data$FREQ)/max.all
+plot(shore_outline, main=data$YEAR[1], col="grey90",border="grey70")
+
+draw.bubble(z=data$FREQ, x=data$CLUST.X, y=data$CLUST.Y, 
+            maxradius=200*s, col=alpha("lightblue", 0.3),pch=19)
+draw.bubble(z=data$FREQ, x=data$CLUST.X, y=data$CLUST.Y, 
+            maxradius=200*s, col=alpha("blue",0.3))
+
+
+legend.bubble(650800,6954000, z=max.all, round=1, n=3, maxradius=200, bty="n",pch=19,
+              col=alpha("lightblue",0.3), txt.cex = 0.7, txt.col="transparent")
+legend.bubble(650800,6954000, z=max.all, round=0, n=3, maxradius=200, bty="n",
+              col=alpha("blue",0.3),txt.cex = 0.7, txt.col = alpha("blue",0.3))
+
+
+#2014
+data<-filter(first.clust,YEAR==2014)
+#determine scaling factor
+s=max(data$FREQ)/max.all
+
+plot(shore_outline, main=data$YEAR[1], col="grey90",border="grey70")
+
+draw.bubble(z=data$FREQ, x=data$CLUST.X, y=data$CLUST.Y, 
+            maxradius=200*s, col=alpha("lightblue", 0.3),pch=19)
+draw.bubble(z=data$FREQ, x=data$CLUST.X, y=data$CLUST.Y, 
+            maxradius=200*s, col=alpha("blue",0.3))
+
+
+legend.bubble(650800,6954000, z=max.all, round=1, n=3, maxradius=200, bty="n",pch=19,
+              col=alpha("lightblue",0.3), txt.cex = 0.7, txt.col="transparent")
+legend.bubble(650800,6954000, z=max.all, round=0, n=3, maxradius=200, bty="n",
+              col=alpha("blue",0.3),txt.cex = 0.7, txt.col = alpha("blue",0.3))
+
+
+```
+
+```{r}
+
+m<-matrix(c(1,1,2,
+            1,1,2,
+            3,3,4,
+            3,3,4,
+            5,5,6,
+            5,5,6,
+            7,7,7),3,7)
+layout(m)
+
+
+#determine max frequency
+max.all<-max(first.clust$FREQ)
+
+#2012 - 1
+data<-filter(first.clust,YEAR==2012)
+#determine scaling factor
+s=max(data$FREQ)/max.all
+
+plot(shore_outline, main=data$YEAR[1], col="grey90",border="grey70")
+
+draw.bubble(z=data$FREQ, x=data$CLUST.X, y=data$CLUST.Y, 
+         maxradius=200*s, col=alpha("lightblue", 0.3),pch=19)
+draw.bubble(z=data$FREQ, x=data$CLUST.X, y=data$CLUST.Y, 
+            maxradius=200*s, col=alpha("blue",0.3))
+
+
+legend.bubble(650800,6954000, z=max.all, round=1, n=3, maxradius=200, bty="n",pch=19,
+              col=alpha("lightblue",0.3), txt.cex = 0.7, txt.col="transparent")
+legend.bubble(650800,6954000, z=max.all, round=0, n=3, maxradius=200, bty="n",
+              col=alpha("blue",0.3),txt.cex = 0.7, txt.col = alpha("blue",0.3))
+
+
+#2012 spawn dates - 2
+plot(FREQ~DATE,data=spawn.num.12,ylim=c(0,50),
+     xlim=as.POSIXct(c("2012-08-15","2012-10-15"),format="%Y-%m-%d", tz="MST"),type="h",col="grey",
+     lwd=6,lend=2)
+lines(c(peakdates.12$START-12*60*60,peakdates.12$START-12*60*60),c(-1,50))
+lines(c(peakdates.12$END+12*60*60,peakdates.12$END+12*60*60),c(-1,50))
+
+
+
+#2013 - 3
+data<-filter(first.clust,YEAR==2013)
+#determine scaling factor
+s=max(data$FREQ)/max.all
+plot(shore_outline, main=data$YEAR[1], col="grey90",border="grey70")
+
+draw.bubble(z=data$FREQ, x=data$CLUST.X, y=data$CLUST.Y, 
+            maxradius=200*s, col=alpha("lightblue", 0.3),pch=19)
+draw.bubble(z=data$FREQ, x=data$CLUST.X, y=data$CLUST.Y, 
+            maxradius=200*s, col=alpha("blue",0.3))
+
+
+legend.bubble(650800,6954000, z=max.all, round=1, n=3, maxradius=200, bty="n",pch=19,
+              col=alpha("lightblue",0.3), txt.cex = 0.7, txt.col="transparent")
+legend.bubble(650800,6954000, z=max.all, round=0, n=3, maxradius=200, bty="n",
+              col=alpha("blue",0.3),txt.cex = 0.7, txt.col = alpha("blue",0.3))
+
+
+#2013 spawn dates - 4
+plot(FREQ~DATE,data=spawn.num.13,ylim=c(0,50),
+     xlim=as.POSIXct(c("2013-08-15","2013-10-15"),format="%Y-%m-%d", tz="MST"),type="h",col="grey",
+     lwd=6,lend=2)
+lines(c(peakdates.13$START-12*60*60,peakdates.13$START-12*60*60),c(-1,50))
+lines(c(peakdates.13$END+12*60*60,peakdates.13$END+12*60*60),c(-1,50))
+
+
+
+#2014 - 5
+data<-filter(first.clust,YEAR==2014)
+#determine scaling factor
+s=max(data$FREQ)/max.all
+
+plot(shore_outline, main=data$YEAR[1], col="grey90",border="grey70")
+
+draw.bubble(z=data$FREQ, x=data$CLUST.X, y=data$CLUST.Y, 
+            maxradius=200*s, col=alpha("lightblue", 0.3),pch=19)
+draw.bubble(z=data$FREQ, x=data$CLUST.X, y=data$CLUST.Y, 
+            maxradius=200*s, col=alpha("blue",0.3))
+
+
+legend.bubble(650800,6954000, z=max.all, round=1, n=3, maxradius=200, bty="n",pch=19,
+              col=alpha("lightblue",0.3), txt.cex = 0.7, txt.col="transparent")
+legend.bubble(650800,6954000, z=max.all, round=0, n=3, maxradius=200, bty="n",
+              col=alpha("blue",0.3),txt.cex = 0.7, txt.col = alpha("blue",0.3))
+
+#2014 spawn dates - 6
+plot(FREQ~DATE,data=spawn.num.14,ylim=c(0,50),
+     xlim=as.POSIXct(c("2014-09-01","2014-10-01"),format="%Y-%m-%d", tz="MST"),type="h",col="grey",
+     lwd=6,lend=2)
+lines(c(peakdates.14$START-12*60*60,peakdates.14$START-12*60*60),c(-1,50))
+lines(c(peakdates.14$END+12*60*60,peakdates.14$END+12*60*60),c(-1,50))
+
+
+data<-table(ltspawnclust$YEAR,ltspawnclust$SITE)
+data<-data[,order(colSums(data))]
+
+
+
+barplot(data,horiz=TRUE,col=c(alpha("blue",.10),alpha("blue",.50),alpha("blue",1)),
+        border=alpha("blue",0.3))
+
+
+```
+
+
