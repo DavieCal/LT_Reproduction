@@ -303,5 +303,10 @@ barplot(data,horiz=TRUE,col=c(alpha("blue",.10),alpha("blue",.50),alpha("blue",1
 
 
 ```
-
+```{r}
+data<-spawntable[spawntable$MONTH==9,]
+data$ACCEL.SD[is.nan(data$ACCEL.SD)]<-"-"
+data$ACCEL.MEAN[is.nan(data$ACCEL.MEAN)]<-"-"
+kable(data)
+```
 

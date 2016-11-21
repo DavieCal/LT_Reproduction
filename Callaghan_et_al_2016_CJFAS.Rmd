@@ -7,7 +7,7 @@ output:
     pandoc_args: --smart
     reference_docx: format.docx
   html_document:
-    fig_caption: yes
+    fig_caption: yes 
 csl: canadian-journal-of-fisheries-and-aquatic-sciences.csl
 ---
 
@@ -39,7 +39,7 @@ Salmonine fishes (salmons, trouts and chars) are typically observed in a site-ba
 
   Lake trout reproductive behaviour is relatively understudied when compared to other salmonines, and what literature exists is largely from the southern extent of it's geographic range [@muir_lake_2012]. In general, information on the timing of movement onto spawning shoals and the degree of movements among spawning sites for males and females at seasonal and daily scales remains an important knowledge gap. Furthermore, few studies have investigated reproductive strategies of lake trout [@esteve_lake_2008; @muir_lake_2012]. 
   
-The objectives of this chapter is three-fold: (i) to determine when and where lake trout spawn in a typical northern boreal lake; (ii) to describe sex-specific timing and movements of lake trout over the duration of a spawning season; and (iii) to test whether male and female lake trout employ a bet-hedging strategy by spawning on multiple sites. Using data collected from a whole-lake acoustic telemetry array, I will present the movements of five male and six female lake trout over the course of the 2013 spawning season. A spatial temporal clustering analysis was used to determine when and where lake trout formed spawning clusters. These data reveal new insights into the reproductive strategies of male and female lake trout and further our knowledge on spawning site use for managing this iconic Canadian fish species.
+The objectives of this manuscript is three-fold: (i) to determine when and where lake trout spawn in a typical northern boreal lake; (ii) to describe sex-specific timing and movements of lake trout over the duration of a spawning season; and (iii) to test whether male and female lake trout employ a bet-hedging strategy by spawning on multiple sites. Using data collected from a whole-lake acoustic telemetry array, I will present the movements of five male and six female lake trout over the course of the 2013 spawning season. A spatial temporal clustering analysis was used to determine when and where lake trout formed spawning clusters. These data reveal new insights into the reproductive strategies of male and female lake trout and further our knowledge on spawning site use for managing this iconic Canadian fish species.
   
 ##Methods  
 

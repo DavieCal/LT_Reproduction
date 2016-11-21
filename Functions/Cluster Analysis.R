@@ -875,11 +875,25 @@ daily <- fishbind.all %>%
 daily<-daily[daily$DATE!="2012-09-11" & daily$DATE!="2012-09-13",]
 daily<-daily[daily$DATE!="2013-09-24" & daily$DATE!="2013-09-27",]
 
+daily$ACCEL[is.nan(daily$ACCEL)]<-NA
+
 spawntable<- daily %>%
-  group_by(YEAR,SEX)
+  #select(MONTH==9) %>%
+    group_by(YEAR,MONTH,SEX) %>%
+      summarise(n = length(unique(TRANSMITTER)),
+                STEPLENGTH.MEAN=mean(STEPLENGTH, na.rm=TRUE),
+                STEPLENGTH.SD=sd(STEPLENGTH, na.rm=TRUE),
+                PERSINDEX.MEAN=mean(PERSINDEX, na.rm=TRUE),
+                PERSINDEX.SD=sd(PERSINDEX, na.rm=TRUE),
+                ACCEL.MEAN=mean(ACCEL,na.rm=TRUE),
+                ACCEL.SD=sd(ACCEL,na.rm=TRUE))
+library(knitr)
+
+kable(spawntable[spawntable$MONTH==9,])
 
 
 
 
-save(ltspawnclust,first.clust,spawn.num,cluster,shore_outline,file="SpawnClust.RData")
+save(ltspawnclust,first.clust,spawn.num,cluster,shore_outline,
+     daily, spawntable, file="SpawnClust.RData")
 
