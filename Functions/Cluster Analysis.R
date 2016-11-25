@@ -861,6 +861,8 @@ for(i in 1:length(fishlist)){
 }
 
 fishbind.all<-bind_rows(fishlist)
+fishbind.all$YEAR<-as.factor(fishbind.all$YEAR)
+fishbind.all$DATE<-as.factor(fishbind.all$DATE)
 
 daily <- fishbind.all %>%
   group_by(TRANSMITTER,YEAR,DATE) %>%
@@ -868,14 +870,17 @@ daily <- fishbind.all %>%
             SEX=SEX[1],
             STEPLENGTH=sum(STEPLENGTH, na.rm=TRUE),
             PERSINDEX=mean(cos(TURNANGLE), na.rm=TRUE),
-            ACCEL=mean(ACCEL,na.rm=TRUE))
+            ACCELMEAN=mean(ACCEL,na.rm=TRUE),
+            ACCELMEDIAN=median(ACCEL,na.rm=TRUE),
+            ACCELMAX=max(ACCEL,na.rm=TRUE),
+            ACCELSUM=sum(ACCEL,na.rm=TRUE))
   
 #remove download dates (partial data)
 
 daily<-daily[daily$DATE!="2012-09-11" & daily$DATE!="2012-09-13",]
 daily<-daily[daily$DATE!="2013-09-24" & daily$DATE!="2013-09-27",]
 
-daily$ACCEL[is.nan(daily$ACCEL)]<-NA
+daily$ACCELMEAN[is.nan(daily$ACCELMEAN)]<-NA
 
 spawntable<- daily %>%
   #select(MONTH==9) %>%
@@ -885,8 +890,8 @@ spawntable<- daily %>%
                 STEPLENGTH.SD=sd(STEPLENGTH, na.rm=TRUE),
                 PERSINDEX.MEAN=mean(PERSINDEX, na.rm=TRUE),
                 PERSINDEX.SD=sd(PERSINDEX, na.rm=TRUE),
-                ACCEL.MEAN=mean(ACCEL,na.rm=TRUE),
-                ACCEL.SD=sd(ACCEL,na.rm=TRUE))
+                ACCEL.MEAN=mean(ACCELMEAN,na.rm=TRUE),
+                ACCEL.SD=sd(ACCELMEAN,na.rm=TRUE))
 library(knitr)
 
 kable(spawntable[spawntable$MONTH==9,])

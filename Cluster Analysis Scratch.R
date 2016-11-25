@@ -1,13 +1,5 @@
 
 
-
-plot(FREQ~DATE,data=spawn.num[spawn.num$YEAR==2013,],ylim=c(0,50),
-     xlim=as.POSIXct(c("2013-08-15","2013-12-15"),format="%Y-%m-%d", tz="MST"), type="h")
-plot(FREQ~DATE,data=spawn.num[spawn.num$YEAR==2013 & ,],ylim=c(0,50),
-     xlim=as.POSIXct(c("2013-08-15","2013-12-15"),format="%Y-%m-%d", tz="MST"), type="h")
-
-
-
 lines(c(peakstart-12*60*60,peakstart-12*60*60),c(0,25))
 lines(c(peakend+12*60*60,peakend+12*60*60),c(0,25))
 
