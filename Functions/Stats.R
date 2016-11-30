@@ -1,221 +1,159 @@
 #format scientific notation
 
-load("SpawnClust.RData")
+require(car)
+spawn$SPAWN<-as.factor(spawn$SPAWN)
 
-#select only males or females
-data<-daily[daily$MONTH==9 & (daily$SEX=="M" | daily$SEX=="F"),]
-data$DAY<-day(as.Date(data$DATE))
-data$YEAR<-as.factor(data$YEAR)
-data$TRANSMITTER<-as.factor(data$TRANSMITTER)
-data$SEX<-as.factor(data$SEX)
+#total clust
+clust<-as.data.frame(table(spawn$SEX,spawn$TRANSMITTER))
+clust<-clust[clust$Freq!=0,-2]
+m_min<-min(clust$Freq[clust$Var1=="M"])
+m_max<-max(clust$Freq[clust$Var1=="M"])
 
-
-
-############################
-
-#daily displacement
-require(nlme)
-require(multcomp)
-require(lsmeans)
-require(MuMIn)
+f_min<-min(clust$Freq[clust$Var1=="F"])
+f_max<-max(clust$Freq[clust$Var1=="F"])
 
 
+#clust sex and activity
+clust<-as.data.frame(table(spawn$SEX,spawn$SPAWN,spawn$TRANSMITTER))
+clust<-clust[clust$Freq!=0,]
 
-#test if random effect better than linear regression
-#linear model
-gls1<-gls(sqrt(STEPLENGTH)~SEX+YEAR+SEX:YEAR,data=data)
-#mixed effects model
-mod1<-lme(sqrt(STEPLENGTH)~SEX+YEAR+SEX:YEAR, random=~1|TRANSMITTER,data=data, method="REML")
+#hist(log10(clust$Freq))
 
-anova(gls1,mod1)#random effect better model, 
-#l.ratio<-anova(gls1,mod1)[[2,"L.Ratio"]] 
-#0.5*(1-pchisq(l.ratio,1))
-#check for autocorrelation
-acf(residuals(mod1, type="normalized"))#looks like correlation
+#shapiro.test(log1(clust$Freq))
+#leveneTest(log(clust$Freq)~clust$Var1*clust$Var2)
+#majic anova code...ANOVA type III
+options(contrasts=c("contr.sum","contr.poly"))
 
-#add AR1 correlation structure to model
-mod2<-lme(sqrt(STEPLENGTH)~SEX+YEAR+SEX:YEAR, random=~1|TRANSMITTER, correlation=corAR1() ,data=data, method="REML")
-
-#the AR1 model is a better fit then the model without the correlation structure
-anova(mod1,mod2)
-
-#re-check autocorrelation
-acf(residuals(mod2, type="normalized"))#looks pretty good
-
-
-#re-run model 2 with maximum likelihood (ML)
-mod2<-lme(sqrt(STEPLENGTH)~SEX+YEAR+SEX:YEAR, random=~1|TRANSMITTER, correlation=corAR1() ,data=data, method="ML")
-
-summary(mod2)
-
-
-#drop SEX:YEAR 
-mod3<-update(mod2,.~.-SEX:YEAR)
-#check significance of SEX:YEAR
-anova(mod2,mod3)# looks to be insignificant and can be dropped from full model
-
-
-#drop SEX
-mod4.a<-update(mod3,.~.-SEX)
-#check significance of SEX
-anova(mod3,mod4.a)# not significant either
-
-
-#drop YEAR
-mod4.b<-update(mod3,.~.-YEAR)
-#Check significance of YEAR
-anova(mod3,mod4.b)# significant difference
-
-#new model
-mod4<-update(mod3,.~.-SEX)
-
-#drop YEAR
-mod5<-update(mod4,.~.-YEAR)
-#Check significance of YEAR
-anova(mod4,mod5)# significant difference
-
-#full model
-mod.dd<-lme(sqrt(STEPLENGTH)~YEAR, random=~1|TRANSMITTER, correlation=corAR1() ,data=data, method="REML")
-summary(mod.dd)
-r.squaredGLMM(mod.dd)
-
-#check assumptions
-#heterogeneity
-plot(mod.dd)
-#normality
-hist(residuals(mod.dd,type="normalized"))
-#independence
-acf(residuals(mod.dd,type="normalized"))
+clustmod<-lm(log(Freq)~Var1*Var2,data=clust)
 
 
 
-####Persistence Index
+aclust.test<-Anova(clustmod, type=3)
+#total duration
 
-hist(data$PERSINDEX)
+totaldur<-aggregate(TOTALTIME~SEX+SPAWN+TRANSMITTER,data=spawn,sum)
 
 
-boxplot(PERSINDEX~SEX*YEAR,data=data)
+#hist(log(totaldur$TOTALTIME))
+#shapiro.test(log(totaldur$TOTALTIME))
+require(car)
+#leveneTest(log(totaldur$TOTALTIME)~totaldur$SEX*totaldur$SPAWN)
+#majic anova code...ANOVA type III
+options(contrasts=c("contr.sum","contr.poly"))
 
-#test if random effect better than linear regression
-#linear model
-gls1<-gls(PERSINDEX~SEX+YEAR+SEX:YEAR,data=data)
-#mixed effects model
-mod1<-lme(PERSINDEX~SEX+YEAR+SEX:YEAR, random=~1|TRANSMITTER,data=data, method="REML")
+tdurmod<-lm(log(TOTALTIME)~SEX*SPAWN,data=totaldur)
 
-anova(gls1,mod1)#random effect better model, 
-#l.ratio<-anova(gls1,mod1)[[2,"L.Ratio"]] 
-#0.5*(1-pchisq(l.ratio,1))
-#check for autocorrelation
-acf(residuals(mod1, type="normalized"))#looks like correlation
-
-#add AR1 correlation structure to model
-mod2<-lme(PERSINDEX~SEX+YEAR+SEX:YEAR, random=~1|TRANSMITTER, correlation=corAR1() ,data=data, method="REML")
-
-#the AR1 model is a better fit then the model without the correlation structure
-anova(mod1,mod2)
-
-#re-check autocorrelation
-acf(residuals(mod2, type="normalized"))#looks pretty good
-
-mod2<-lme(PERSINDEX~SEX+YEAR+SEX:YEAR, random=~1|TRANSMITTER, correlation=corAR1() ,data=data, method="ML")
-
-#test significance of intereaction
-mod2.a<-update(mod2,.~.-SEX:YEAR)# drop interaction
-anova(mod2,mod2.a)#not significant remove
-
-mod3<-mod2.a
-
-#drop sex
-mod3.a<-update(mod3,.~.-SEX)
-anova(mod3,mod3.a)#significant
-#drop year
-mod3.b<-update(mod3,.~.-YEAR)
-anova(mod3,mod3.b)#significant
-
-#best model
-
-mod.pi<-lme(PERSINDEX~SEX+YEAR, random=~1|TRANSMITTER, correlation=corAR1() ,data=data, method="REML")
-summary(mod.pi)
-r.squaredGLMM(mod.pi)
-
-#check assumptions
-#heterogeneity
-plot(residuals(mod.pi,type="normalized")~fitted(mod.pi))
-#normality
-hist(residuals(mod.pi,type="normalized"))
-#independence
-acf(residuals(mod.pi,type="normalized"))
+tdurp.test<-Anova(tdurmod, type=3)
 
 
 
-###Acceleration
+#duration per cluster
 
-#accelerometers not available in 2012
-data.ac<-data[data$YEAR!=2012,]
-data.ac$YEAR<-droplevels(data.ac$YEAR)
-#remove fish without accelerometers
-data.ac<-data.ac[!is.na(data.ac$ACCELMEAN),]
+dur<-data.frame(SEX=spawn$SEX,
+                SPAWN=as.factor(spawn$SPAWN),
+                TRANSMITTER=spawn$TRANSMITTER,
+                DURATION=spawn$TOTALTIME)
 
-hist(data.ac$ACCELMEDIAN)
-#log transform for normality
-hist(log10(data.ac$ACCELMEDIAN))
-boxplot(log10(ACCELMEDIAN)~SEX*YEAR,data.ac)
-#test if random effect better than linear regression
-#linear model
-gls1<-gls(log10(ACCELMEDIAN)~SEX+YEAR+SEX:YEAR,data=data.ac)
-#mixed effects model
-mod1<-lme(log(ACCEL)~SEX+YEAR+SEX:YEAR, random=~1|TRANSMITTER,data=data.ac, method="REML")
 
-anova(gls1,mod1)#random effect better model, 
-#l.ratio<-anova(gls1,mod1)[[2,"L.Ratio"]] 
-#0.5*(1-pchisq(l.ratio,1))
-#check for autocorrelation
-acf(residuals(mod1, type="normalized"))#looks like correlation
+#hist(log(dur$DURATION))
+#shapiro.test(log(dur$DURATION))
+#bartlett.test(log(dur$DURATION)~dur$SEX)
 
-#add AR1 correlation structure to model
-mod2<-lme(log(ACCEL)~SEX+YEAR+SEX:YEAR, random=~1|TRANSMITTER, correlation=corAR1() ,data=data.ac, method="REML")
+require(car)
+#leveneTest(log(dur$DURATION)~dur$SEX*dur$SPAWN)
+#majic anova code...ANOVA type III
+options(contrasts=c("contr.sum","contr.poly"))
 
-#the AR1 model is a better fit then the model without the correlation structure
-anova(mod1,mod2)
+durmod<-lm(log(DURATION)~SEX*SPAWN,data=dur)
 
-#re-check autocorrelation
-acf(residuals(mod2, type="normalized"))#looks pretty good
-
-mod2<-lme(log(ACCEL)~SEX+YEAR+SEX:YEAR, random=~1|TRANSMITTER, correlation=corAR1() ,data=data.ac, method="ML")
-
-#test significance of intereaction
-mod2.a<-update(mod2,.~.-SEX:YEAR)# drop interaction
-anova(mod2,mod2.a)#not significant remove
-
-mod3<-mod2.a
-
-#drop sex
-mod3.a<-update(mod3,.~.-SEX)
-anova(mod3,mod3.a)#not significant
-#drop year
-mod3.b<-update(mod3,.~.-YEAR)
-anova(mod3,mod3.b)#not significant and greater
-
-mod4<-mod3.a
-#drop sex
-mod4.a<-update(mod4,.~.-YEAR)
-anova(mod4,mod4.a)#not significant
-
-#best model
-
-mod.ac<-lme(log(ACCEL)~SEX+YEAR, random=~1|TRANSMITTER, correlation=corAR1() ,data=data.ac, method="REML")
-summary(mod.ac)
-r.squaredGLMM(mod.ac)
-lsmeans(mod.ac,pairwise~SEX+YEAR)
-
-#check assumptions
-#heterogeneity
-plot(residuals(mod.ac,type="normalized")~fitted(mod.ac))
-#normality
-hist(residuals(mod.ac,type="normalized"))
-#independence
-acf(residuals(mod.ac,type="normalized"))
+adurp.test<-Anova(durmod, type=3)
 
 
 
+#unique site visits
+require(car)
+visit<-aggregate(SITE~SEX+SPAWN+TRANSMITTER,data=spawn,function(x) length(unique(x)))
+
+#hist(log(visit$SITE))
+#shapiro.test(log(visit$SITE))
+#leveneTest(log(visit$SITE)~visit$SEX*visit$SPAWN)
+
+#majic anova code...ANOVA type III
+options(contrasts=c("contr.sum","contr.poly"))
+
+vismod<-lm(log(SITE)~SEX*SPAWN,data=visit)
+
+avisit.test<-Anova(vismod, type=3)
+
+
+#dist between
+
+dist<-data.frame(SEX=spawn$SEX,
+                 SPAWN=as.factor(spawn$SPAWN),
+                 TRANSMITTER=spawn$TRANSMITTER,
+                 DISTCLUST =spawn$DISTCLUST,
+                 TIMECLUST=spawn$TIMECLUST)
+
+
+
+#hist(log(dist$DISTCLUST))
+
+require(car)
+#leveneTest((log(dist$DISTCLUST))~dist$SEX*dist$SPAWN)
+#majic anova code...ANOVA type III
+options(contrasts=c("contr.sum","contr.poly"))
+
+distmod<-lm(log(DISTCLUST)~SEX*SPAWN,data=dist)
+
+adist.test<-Anova(distmod,type=3)
+
+
+#time between
+
+#hist(1/(dist$TIMECLUST)^(1/3))
+
+#shapiro.test(1/(dist$TIMECLUST)^(1/3))
+#qqnorm(1/((dist$TIMECLUST)^(1/3)))
+require(car)
+#leveneTest(log(dur$DURATION)~dur$SEX*dur$SPAWN)
+#majic anova code...ANOVA type III
+options(contrasts=c("contr.sum","contr.poly"))
+
+timemod<-lm(1/(TIMECLUST)^(1/3)~SEX*SPAWN,data=dist)
+
+atime.test<-Anova(timemod, type=3)
+
+
+#sites prior to spawn
+prior<-data.frame(SEX=spawn$SEX,
+                  SPAWN=as.factor(spawn$SPAWN),
+                  TRANSMITTER=spawn$TRANSMITTER,
+                  CLUSTPRIOR =spawn$CLUSTPRIOR)
+prior<-aggregate(CLUSTPRIOR~SEX+TRANSMITTER,data=spawn,mean)
+
+
+prior.test<-wilcox.test(CLUSTPRIOR~SEX,data=prior)
+
+
+
+
+
+#MCP
+
+smcp<-mcpclust[,-c(3,5,6)]
+smcp$SPAWN<-1
+names(smcp)<-c("TRANSMITTER","SEX","MCP","SPAWN")
+nmcp<-mcpclust[,-c(3,4,6)]
+nmcp$SPAWN<-0
+names(nmcp)<-c("TRANSMITTER","SEX","MCP","SPAWN")
+mcp<-rbind(smcp,nmcp)
+mcp$SPAWN<-as.factor(mcp$SPAWN)
+
+#shapiro.test(log(mcp$MCP))
+require(car)
+#leveneTest(log(MCP)~SEX*SPAWN,data=mcp)
+#majic anova code...ANOVA type III
+options(contrasts=c("contr.sum","contr.poly"))
+areamod<-lm(log(MCP)~SEX*SPAWN,data=mcp)
+aarea.test<-Anova(areamod,type=3)
 

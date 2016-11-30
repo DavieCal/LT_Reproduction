@@ -899,6 +899,130 @@ kable(spawntable[spawntable$MONTH==9,])
 
 
 
+#distance between spawning shoals
+spawn<-NULL
+data<-ltspawnclust[ltspawnclust$MONTH==9,]
+years<-unique(data$YEAR)
+#loop for each year
+for(i in 1:length(years)){
+  #extract year data
+  data.year<-data[data$YEAR==years[i],]
+  #extract unique tags
+  tags<-unique(data.year$TRANSMITTER)
+  #loop for each unique tag
+  for(ii in 1:length(tags)){
+    #extract tag specific data
+    fishi<-data.year[data.year$TRANSMITTER==tags[ii],]
+    fishi$DISTCLUST<-NA
+    fishi$TIMECLUST<-NA
+    
+    if(dim(fishi)[1]>1){
+      t<-fishi$STARTTIME
+      x<-fishi$CLUST.X
+      y<-fishi$CLUST.Y
+      #add x and y data as real and imaginary numbers in the z vector
+      z<-x+1i*y
+      #determine step lengths
+      fishi$DISTCLUST[2:length(z)]<-Mod(diff(z))
+      fishi$TIMECLUST[2:length(z)]<-difftime(t[c(2:length(t))],t[c(1:length(t)-1)],units="hours")
+    }
+    
+    fishi$DISTSPAWNCLUST=NA
+    fishi$TIMESPAWNCLUST=NA 
+    fishi$CLUSTPRIOR=NA
+    fishi2<-fishi[fishi$SPAWN==1,]
+    if(dim(fishi2)[1]>0){
+      ## clusters prior to first high activity cluster
+      fishi$CLUSTPRIOR<-match(1,fishi$SPAWN)-1
+      if(dim(fishi2)[1]>1){
+        t<-fishi2$STARTTIME
+        x<-fishi2$CLUST.X
+        y<-fishi2$CLUST.Y
+        #add x and y data as real and imaginary numbers in the z vector
+        z<-x+1i*y
+        fishi[fishi$SPAWN==1,]$DISTSPAWNCLUST[2:length(z)]<-Mod(diff(z))
+        fishi[fishi$SPAWN==1,]$TIMESPAWNCLUST[2:length(z)]<-difftime(t[c(2:length(t))],t[c(1:length(t)-1)],units="hours")
+      }
+    }
+    fishi$DISTNOCLUST=NA
+    fishi$TIMENOCLUST=NA 
+    fishi2<-fishi[fishi$SPAWN==0,]
+    if(dim(fishi2)[1]>1){
+      t<-fishi2$STARTTIME
+      x<-fishi2$CLUST.X
+      y<-fishi2$CLUST.Y
+      #add x and y data as real and imaginary numbers in the z vector
+      z<-x+1i*y
+      fishi[fishi$SPAWN==0,]$DISTNOCLUST[2:length(z)]<-Mod(diff(z))
+      fishi[fishi$SPAWN==0,]$TIMENOCLUST[2:length(z)]<-difftime(t[c(2:length(t))],t[c(1:length(t)-1)],units="hours")
+    }
+    
+    spawn<-rbind(spawn,fishi)
+  }
+}
+
+
+#UTM 
+
+
+
+require(adehabitatHR)
+mcpclust=NULL
+years<-unique(spawn$YEAR)
+
+for(i in 1:length(years)){
+  spawn.year<-spawn[spawn$YEAR==years[i],]
+  #extract unique tags
+  tags<-unique(spawn.year$TRANSMITTER)
+  #loop for each unique tag
+  for(ii in 1:length(tags)){
+    #extract tag specific data
+    fishi<-spawn.year[spawn.year$TRANSMITTER==tags[ii],]
+    
+    xy<-SpatialPoints(cbind(fishi$CLUST.X,fishi$CLUST.Y))
+    cp100=NULL
+    cp50=NULL
+    cp100$area=NA
+    cp50$area=NA
+    if(length(xy)>4){
+      cp100=adehabitatHR::mcp(xy,percent=100,unout="km2")
+      cp50=adehabitatHR::mcp(xy,percent=50,unout="km2")
+    }
+    #spawn clusters
+    fishi2<-fishi[fishi$SPAWN==1,]
+    cps=NULL
+    cps$area=NA
+    if(dim(fishi2)[1]>4){
+      new.xy<-SpatialPoints(cbind(fishi2$CLUST.X,fishi2$CLUST.Y))
+      cps=adehabitatHR::mcp(new.xy,percent=100,unout="km2")
+    }
+    fishi2<-fishi[fishi$SPAWN==0,]
+    cpn=NULL
+    cpn$area=NA
+    if(dim(fishi2)[1]>4){
+      new.xy<-SpatialPoints(cbind(fishi2$CLUST.X,fishi2$CLUST.Y))
+      cpn=adehabitatHR::mcp(new.xy,percent=100,unout="km2")
+    }
+    mcpclust1<-data.frame(TRANSMITTER=tags[ii],
+                          SEX=fishi$SEX[1],
+                          MCP100=cp100$area,
+                          MCP50=cp50$area,
+                          SPAWNMCP=cps$area,
+                          NOMCP=cpn$area,
+                          PERC=cps$area/cp100$area*100)
+    mcpclust<-rbind(mcpclust,mcpclust1)
+    assign(paste("mcp100lt",substr(tags[ii],start=4,stop=5),"y",years[i],sep=""),cp100)
+    assign(paste("mcp50lt",substr(tags[ii],start=4,stop=5),"y",years[i],sep=""),cp50)
+  }
+}
+ 
+require(adehabitatHR)
+xy<-SpatialPoints(cbind(spawn$CLUST.X,spawn$CLUST.Y))
+all_mcp<-adehabitatHR::mcp(xy,percent=100,unout="km2")
+
+####overlap
+?gOverlaps
+
 save(ltspawnclust,first.clust,spawn.num,cluster,shore_outline,
-     daily, spawntable, file="SpawnClust.RData")
+     daily, spawntable, spawn, mcpclust, all_mcp, file="SpawnClust.RData")
 

@@ -409,38 +409,6 @@ site<-data.frame(SEX=c("Male","Female"),
                  SPAWNTOTALTIMESD=c(mts_sum_sd,fts_sum_sd)
 )
 
-require(adehabitatHR)
-mcpclust=NULL
-ctags<-unique(ltspawnclust3$TRANSMITTER)
-for(i in 1:length(fishlist)){
-  fishi=fishlist[[i]]
-  xy<-SpatialPoints(cbind(fishi$UTM.X,fishi$UTM.Y))
-  if(fishi$TRANSMITTER[1]%in%ctags){
-    clust<-ltspawnclust3[ltspawnclust3$TRANSMITTER==fishi$TRANSMITTER[1],]
-    clusters<-unique(clust$CLUSTER)
-    new.xy<-xy[fishi$CLUSTER%in%clusters,]
-    cp=mcp(new.xy,percent=100,unout="km2")
-    #spawn clusters
-    clust<-ltspawnclust3[ltspawnclust3$TRANSMITTER==fishi$TRANSMITTER[1] & ltspawnclust3$SPAWN==1,]
-    clusters<-unique(clust$CLUSTER)
-    new.xy<-xy[fishi$CLUSTER%in%clusters,]
-    cps=mcp(new.xy,percent=100,unout="km2")
-    clust<-ltspawnclust3[ltspawnclust3$TRANSMITTER==fishi$TRANSMITTER[1] & ltspawnclust3$SPAWN==0,]
-    clusters<-unique(clust$CLUSTER)
-    new.xy<-xy[fishi$CLUSTER%in%clusters,]
-    cpn=mcp(new.xy,percent=100,unout="km2")
-    mcpclust1<-data.frame(TRANSMITTER=fishi$TRANSMITTER[1],
-                          SEX=fishi$SEX[1],
-                          MCP=cp$area,
-                          SPAWNMCP=cps$area,
-                          NOMCP=cpn$area,
-                          PERC=cps$area/cp$area*100)
-    mcpclust<-rbind(mcpclust,mcpclust1)
-  }
-}
-require(adehabitatHR)
-xy<-SpatialPoints(cbind(spawn$CLUST.X,spawn$CLUST.Y))
-all_mcp<-mcp(xy,percent=100,unout="km2")
 
 
 m_area<-mean(mcpclust$MCP[mcpclust$SEX=="M"])
