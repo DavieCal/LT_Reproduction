@@ -15,26 +15,36 @@ data$SEX<-as.factor(data$SEX)
 
 #daily displacement
 require(nlme)
-require(multcomp)
-require(lsmeans)
 require(MuMIn)
-require(lmtest)
+require(lattice)
 
+xyplot(sqrt(STEPLENGTH) ~ DAY|TRANSMITTER, groups=YEAR, type= c("p", "r"), data=data)
 
 #test if random effect better than linear regression
 #linear model
-gls1<-gls(sqrt(STEPLENGTH)~SEX+YEAR+SEX:YEAR,data=data)
+gls1<-gls(sqrt(STEPLENGTH)~SEX+DAY+I(DAY^2)+YEAR,data=data)
 #mixed effects model
-mod1<-lme(sqrt(STEPLENGTH)~SEX+YEAR+SEX:YEAR, random=~1|TRANSMITTER,data=data, method="REML")
+mod1<-lme(sqrt(STEPLENGTH)~SEX+DAY+I(DAY^2)+YEAR, random=~1|TRANSMITTER,data=data, method="REML")
 
-anova(gls1,mod1)#random effect better model, 
-#l.ratio<-anova(gls1,mod1)[[2,"L.Ratio"]] 
-#0.5*(1-pchisq(l.ratio,1))
-#check for autocorrelation
+#check variance inflation factor
+vif(mod1)
+#centre days
+data$cDAY<-data$DAY-mean(data$DAY)
+
+#linear model
+gls1<-gls(sqrt(STEPLENGTH)~SEX+cDAY+I(cDAY^2)+YEAR,data=data)
+#mixed effects model
+mod1<-lme(sqrt(STEPLENGTH)~SEX+cDAY+I(cDAY^2)+YEAR, random=~1|TRANSMITTER,data=data, method="REML")
+#re-check variance inflation factor
+vif(mod1)
+
+#test is random effects improves model
+anova(gls1,mod1)#random effect better model,
+
 acf(residuals(mod1, type="normalized"))#looks like correlation
 
 #add AR1 correlation structure to model
-mod2<-lme(sqrt(STEPLENGTH)~SEX+YEAR+SEX:YEAR, random=~1|TRANSMITTER, correlation=corAR1() ,data=data, method="REML")
+mod2<-lme(sqrt(STEPLENGTH)~SEX+cDAY+I(cDAY^2)+YEAR, random=~1|TRANSMITTER, correlation=corAR1(form=~1|TRANSMITTER/YEAR) ,data=data, method="REML")
 
 #the AR1 model is a better fit then the model without the correlation structure
 anova(mod1,mod2)
@@ -44,38 +54,37 @@ acf(residuals(mod2, type="normalized"))#looks pretty good
 
 
 #re-run model 2 with maximum likelihood (ML)
-mod2<-lme(sqrt(STEPLENGTH)~SEX+YEAR+SEX:YEAR, random=~1|TRANSMITTER, correlation=corAR1() ,data=data, method="ML")
+mod2<-lme(sqrt(STEPLENGTH)~SEX+cDAY+I(cDAY^2)+YEAR, random=~1|TRANSMITTER, correlation=corAR1(form=~1|TRANSMITTER/YEAR) ,data=data, method="ML")
 
 summary(mod2)
 
 
-#drop SEX:YEAR 
-mod3<-update(mod2,.~.-SEX:YEAR)
-#check significance of SEX:YEAR
-anova(mod2,mod3)# looks to be insignificant and can be dropped from full model
-
-
 #drop SEX
-mod4.a<-update(mod3,.~.-SEX)
+mod2.a<-update(mod2,.~.-SEX)
 #check significance of SEX
-anova(mod3,mod4.a)# not significant either
+anova(mod2,mod2.a)# looks to be insignificant and can be dropped from full model
+
+
+#drop DAY
+mod2.b<-update(mod2,.~.-cDAY)
+#check significance of DAY
+anova(mod2,mod2.b)# significant!
+
+#drop DAY^2
+mod2.c<-update(mod2,.~.-I(cDAY^2))
+#check significance of DAY^2
+anova(mod2,mod2.c)# significant!
 
 
 #drop YEAR
-mod4.b<-update(mod3,.~.-YEAR)
+mod2.d<-update(mod2,.~.-YEAR)
 #Check significance of YEAR
-anova(mod3,mod4.b)# significant difference
+anova(mod2,mod2.d)# significant difference
 
-#new model
-mod4<-update(mod3,.~.-SEX)
 
-#drop YEAR
-mod5<-update(mod4,.~.-YEAR)
-#Check significance of YEAR
-anova(mod4,mod5)# significant difference
 
 #full model
-mod.dd<-lme(sqrt(STEPLENGTH)~YEAR, random=~1|TRANSMITTER, correlation=corAR1() ,data=data, method="REML")
+mod.dd<-mod2.a
 summary(mod.dd)
 r.squaredGLMM(mod.dd)
 
@@ -97,21 +106,26 @@ hist(data$PERSINDEX)
 
 
 boxplot(PERSINDEX~SEX*YEAR,data=data)
+xyplot(PERSINDEX ~ DAY|TRANSMITTER, groups=YEAR, type= c("p", "r"), data=data)
+
 
 #test if random effect better than linear regression
 #linear model
-gls1<-gls(PERSINDEX~SEX+YEAR+SEX:YEAR,data=data)
+gls1<-gls(PERSINDEX~SEX+cDAY+I(cDAY^2)+YEAR,data=data)
 #mixed effects model
-mod1<-lme(PERSINDEX~SEX+YEAR+SEX:YEAR, random=~1|TRANSMITTER,data=data, method="REML")
+mod1<-lme(PERSINDEX~SEX+cDAY+I(cDAY^2)+YEAR, random=~1|TRANSMITTER,data=data, method="REML")
 
-anova(gls1,mod1)#random effect better model, 
+#check variance inflation factor
+vif(mod1)
+anova(gls1,mod1)#random effect better model,
 #l.ratio<-anova(gls1,mod1)[[2,"L.Ratio"]] 
 #0.5*(1-pchisq(l.ratio,1))
 #check for autocorrelation
 acf(residuals(mod1, type="normalized"))#looks like correlation
 
 #add AR1 correlation structure to model
-mod2<-lme(PERSINDEX~SEX+YEAR+SEX:YEAR, random=~1|TRANSMITTER, correlation=corAR1() ,data=data, method="REML")
+mod2<-lme(PERSINDEX~SEX+cDAY+I(cDAY^2)+YEAR, random=~1|TRANSMITTER, correlation=corAR1(form=~1|TRANSMITTER/YEAR) ,data=data, method="REML")
+
 
 #the AR1 model is a better fit then the model without the correlation structure
 anova(mod1,mod2)
@@ -119,25 +133,38 @@ anova(mod1,mod2)
 #re-check autocorrelation
 acf(residuals(mod2, type="normalized"))#looks pretty good
 
-mod2<-lme(PERSINDEX~SEX+YEAR+SEX:YEAR, random=~1|TRANSMITTER, correlation=corAR1() ,data=data, method="ML")
+mod2<-lme(PERSINDEX~SEX+cDAY+I(cDAY^2)+YEAR, random=~1|TRANSMITTER, correlation=corAR1(form=~1|TRANSMITTER/YEAR) ,data=data, method="ML")
 
-#test significance of intereaction
-mod2.a<-update(mod2,.~.-SEX:YEAR)# drop interaction
-anova(mod2,mod2.a)#not significant remove
 
-mod3<-mod2.a
+summary(mod2)
 
-#drop sex
-mod3.a<-update(mod3,.~.-SEX)
-anova(mod3,mod3.a)#significant
-#drop year
-mod3.b<-update(mod3,.~.-YEAR)
-anova(mod3,mod3.b)#significant
+
+#drop SEX
+mod2.a<-update(mod2,.~.-SEX)
+#check significance of SEX
+anova(mod2,mod2.a)# significant
+
+
+#drop DAY
+mod2.b<-update(mod2,.~.-cDAY)
+#check significance of DAY
+anova(mod2,mod2.b)# significant!
+
+#drop DAY^2
+mod2.c<-update(mod2,.~.-I(cDAY^2))
+#check significance of DAY^2
+anova(mod2,mod2.c)# insignificant
+
+
+#drop YEAR
+mod2.d<-update(mod2,.~.-YEAR)
+#Check significance of YEAR
+anova(mod2,mod2.d)# significant difference
+
 
 #best model
 
-mod.pi<-lme(PERSINDEX~SEX+YEAR, random=~1|TRANSMITTER, correlation=corAR1() ,data=data, method="REML")
-summary(mod.pi)
+mod.pi<-mod2.c
 r.squaredGLMM(mod.pi)
 
 #check assumptions
@@ -163,21 +190,26 @@ data.ac<-data.ac[!is.na(data.ac$ACCELMEAN),]
 hist(data.ac$ACCELMEAN)
 #log transform for normality
 hist(log(data.ac$ACCELMEAN))
-boxplot(log(ACCELMEAN)~SEX*YEAR,data.ac)
+boxplot(log(ACCELMEAN)~SEX,data.ac)
+xyplot(log(ACCELMEAN) ~ DAY|TRANSMITTER, type= c("p", "r"), data=data)
+
+
 #test if random effect better than linear regression
 #linear model
-gls1<-gls(log(ACCELMEAN)~SEX+YEAR+SEX:YEAR,data=data.ac)
+gls1<-gls(log(ACCELMEAN)~SEX+cDAY+I(cDAY^2)+YEAR,data=data.ac)
 #mixed effects model
-mod1<-lme(log(ACCELMEAN)~SEX+YEAR+SEX:YEAR, random=~1|TRANSMITTER,data=data.ac, method="REML")
+mod1<-lme(log(ACCELMEAN)~SEX+cDAY+I(cDAY^2)+YEAR, random=~1|TRANSMITTER,data=data.ac, method="REML")
+
+#check variance inflation
+vif(mod1)
 
 anova(gls1,mod1)#random effect better model, 
-#l.ratio<-anova(gls1,mod1)[[2,"L.Ratio"]] 
-#0.5*(1-pchisq(l.ratio,1))
+
 #check for autocorrelation
 acf(residuals(mod1, type="normalized"))#looks like correlation
 
 #add AR1 correlation structure to model
-mod2<-lme(log(ACCELMEAN)~SEX+YEAR+SEX:YEAR, random=~1|TRANSMITTER, correlation=corAR1() ,data=data.ac, method="REML")
+mod2<-lme(log(ACCELMEAN)~SEX+cDAY+I(cDAY^2)+YEAR, random=~1|TRANSMITTER, correlation=corAR1(form=~1|TRANSMITTER) ,data=data.ac, method="REML")
 
 #the AR1 model is a better fit then the model without the correlation structure
 anova(mod1,mod2)
@@ -185,35 +217,23 @@ anova(mod1,mod2)
 #re-check autocorrelation
 acf(residuals(mod2, type="normalized"))#looks pretty good
 
-mod2<-lme(log(ACCELMEAN)~SEX+YEAR+SEX:YEAR, random=~1|TRANSMITTER, correlation=corAR1() ,data=data.ac, method="ML")
+mod2<-lme(log(ACCELMEAN)~SEX+DAY+I(DAY^2), random=~1|TRANSMITTER, correlation=corAR1(form=~1|TRANSMITTER) ,data=data.ac, method="ML")
 
 #test significance of intereaction
-mod2.a<-update(mod2,.~.-SEX:YEAR)# drop interaction
+mod2.a<-update(mod2,.~.-SEX)# drop interaction
 anova(mod2,mod2.a)#not significant remove
 
-mod3<-mod2.a
+mod2.a<-update(mod2,.~.-DAY)# drop interaction
+anova(mod2,mod2.a)#not significant remove
 
-#drop sex
-mod3.a<-update(mod3,.~.-SEX)
-anova(mod3,mod3.a)#not significant but on the margin
-l.ratio<-anova(mod3,mod3.a)[[2,"L.Ratio"]] 
-0.5*(1-pchisq(l.ratio,1))#still not significant
-
-
-#drop year
-mod3.b<-update(mod3,.~.-YEAR)
-anova(mod3,mod3.b)#not significant and greater
-
-mod4<-mod3.b
-#drop sex
-mod4.a<-update(mod4,.~.-SEX)
-anova(mod4,mod4.a)#not significant
+mod2.a<-update(mod2,.~.-I(DAY^2))# drop interaction
+anova(mod2,mod2.a)#not significant remove
 
 #best model
 
-mod.ac<-lme(log(ACCELMEAN)~1, random=~1|TRANSMITTER, correlation=corAR1() ,data=data.ac, method="REML")
-summary(mod.ac)
-r.squaredGLMM(mod.ac)
+mod.ac<-lme(log(ACCELMEAN)~SEX, random=~1|TRANSMITTER, correlation=corAR1(form=~1|TRANSMITTER) ,data=data.ac, method="REML")
+
+r.squaredGLMM(mod2)
 
 #check assumptions
 #heterogeneity
@@ -226,6 +246,6 @@ hist(residuals(mod.ac,type="normalized"))
 acf(residuals(mod.ac,type="normalized"))
 
 library(car)
-Anova(update(mod2,.~.-YEAR-SEX:YEAR))
+Anova(mod.ac)
 
 

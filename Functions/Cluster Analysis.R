@@ -1021,8 +1021,51 @@ xy<-SpatialPoints(cbind(spawn$CLUST.X,spawn$CLUST.Y))
 all_mcp<-adehabitatHR::mcp(xy,percent=100,unout="km2")
 
 ####overlap
-?gOverlaps
+gOverlap <- function(hr1, hr2, ...) {
+  a <- gIntersection(hr1, hr2, ...)
+  if (is.null(a)) {
+    return(0)
+  }
+  gArea(a, byid=TRUE) / gArea(hr1, byid=TRUE) 
+}
+
+
+mcp2012<-c("mcp100lt13y2012", "mcp100lt17y2012", "mcp100lt18y2012", "mcp100lt19y2012", "mcp100lt1y2012", 
+           "mcp100lt22y2012", "mcp100lt3y2012", "mcp100lt8y2012")
+
+mcp2013<-c("mcp100lt13y2013", "mcp100lt17y2013", "mcp100lt18y2013", "mcp100lt19y2013", "mcp100lt1y2013",  
+           "mcp100lt22y2013", "mcp100lt3y2013", "mcp100lt8y2013")
+
+mcp2014<-c("", "", "", "mcp100lt19y2014", "mcp100lt1y2014",  
+           "", "", "")
+
+mcpoverlap<-NULL           
+for(i in 1:length(mcp2012)){
+  c12<-get(ls()[grep(mcp2012[i],ls())])
+  c13<-get(ls()[grep(mcp2013[i],ls())])
+  c14<-mcp2014[i]
+  overlap1213<-gOverlap(c12,c13)
+  overlap1214<-NA
+  overlap1314<-NA
+  if(c14!=""){
+    c14<-get(ls()[grep(c14,ls())])
+    overlap1214<-gOverlap(c12,c14)
+    overlap1314<-gOverlap(c13,c14)
+  }
+  mcpoverlap1<-data.frame(TRANSMITTER=gsub("^.*lt([0-9]+).*$", "LT-\\1", mcp2012[i]),
+                          OVERLAP_12_13=overlap1213,
+                          OVERLAP_12_14=overlap1214,
+                          OVERLAP_13_14=overlap1314)
+  mcpoverlap=rbind(mcpoverlap,mcpoverlap1)
+  
+}
+
+
+
+
+
+
 
 save(ltspawnclust,first.clust,spawn.num,cluster,shore_outline,
-     daily, spawntable, spawn, mcpclust, all_mcp, file="SpawnClust.RData")
+     daily, spawntable, spawn, mcpclust, all_mcp,mcpoverlap, file="SpawnClust.RData")
 
