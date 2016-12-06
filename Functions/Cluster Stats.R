@@ -22,97 +22,97 @@ data$SEX<-droplevels(data$SEX)
 require(nlme)
 require(MASS)
 require(lme4)
-require(multcomp)
-require(lsmeans)
 require(MuMIn)
-library(dplyr)
-
+require(dplyr)
+require(car)
 data.test<-data %>%
   group_by(TRANSMITTER,SEX,SPAWN) %>%
-  summarise(FREQ= length(CLUSTER))
+  summarise(FREQ = length(CLUSTER),
+            TOTALTIME = sum(TOTALTIME),
+            VISITS = length(uniqiue(SITE)))
 
 hist(log10(data.test$FREQ))
 boxplot(FREQ~SEX*SPAWN,data=data.test)
 
 require(lattice)
 
-xyplot(FREQ ~ SPAWN|TRANSMITTER, groups=SEX, type= c("p", "r"), data=data.test)
+xyplot(FREQ ~ |TRANSMITTER, groups=SEX, type= c("p", "r"), data=data.test)
 
-
-#test if random effect better than linear regression
-#linear model
-glm1<-glm(FREQ~SEX*SPAWN,family=poisson,data=data.test)
+mod1<-gls(log(FREQ)~SEX*SPAWN,data=data.test)
 #mixed effects model
-#set optimizer for lme
-mod1<-glmer(FREQ~SEX*SPAWN + (1|TRANSMITTER), family=poisson,data=data.test)
+mod2<-lme(log(FREQ)~SEX*SPAWN,random=~1|TRANSMITTER,data=data.test,method="REML")
 
-anova(mod1,glm1)
+anova(mod1,mod2)
 
 #check for autocorrelation
-acf(residuals(mod1))#looks like correlation
+acf(residuals(mod1))#correlation
+mod3<-gls(log(FREQ)~SEX*SPAWN,correlation=corAR1(),data=data.test)
+acf(residuals(mod3,type="normalized"))
+anova(mod1,mod3)
 
-
-#re-run model 2 with maximum likelihood (ML)
-mod1<-glmer(FREQ~SEX+SPAWN+ SEX:SPAWN  + (1|TRANSMITTER), family=poisson,data=data.test,REML=FALSE)
-summary(mod1)
-
-
-#drop SEX
-mod1.a<-update(mod1,.~.-SEX)
-#check significance of SEX
-anova(mod1,mod1.a)# looks to be insignificant and can be dropped from full model
-
-
-#drop SPAWN
-mod1.b<-update(mod1,.~.-SPAWN)
-#check significance of SPAWN
-anova(mod1,mod1.b)# not significant either
-
-#drop interaction
-mod1.c<-update(mod1,.~.-SEX:SPAWN)
-#check significance of SEX:SPAWN
-anova(mod1,mod1.c)# not significant either
+mod3<-gls(log(FREQ)~SEX*SPAWN,correlation=corAR1(),data=data.test, method="ML")
+Anova(mod3,type=3)
 
 
 
-mod2<-mod1.b
-#drop SEX
-mod2.a<-update(mod2,.~.-SEX)
-#check significance of SEX
-anova(mod2,mod2.a)# looks to be insignificant and can be dropped from full model
+summary(mod3)
 
-
-#drop SEX
-mod2.b<-update(mod2,.~.-SEX:SPAWN)
-#check significance of SEX
-anova(mod2,mod2.b)# looks to be insignificant and can be dropped from full model
-
-mod3<-mod2.a
-
-mod3.a<-update(mod3,.~.-SEX:SPAWN)
-anova(mod3,mod3.a)
-
-#new model
-mod5<-update(mod4,.~.-SEX)
-
-#drop YEAR
-mod6<-update(mod5,.~.-YEAR)
-#Check significance of YEAR
-anova(mod5,mod6)# significant difference
-
-#full model
-mod.dd<-lme(sqrt(STEPLENGTH)~YEAR, random=~1|TRANSMITTER, correlation=corAR1() ,data=data, method="REML")
-summary(mod.dd)
-r.squaredGLMM(mod.dd)
 
 #check assumptions
 #heterogeneity
-plot(fitted(mod1), residuals(mod1), xlab = "Fitted Values", ylab = "Residuals")
+plot(fitted(mod3), residuals(mod3,type="normalized"), xlab = "Fitted Values", ylab = "Residuals")
 abline(h = 0, lty = 2)
-lines(smooth.spline(fitted(mod1), residuals(mod1)),col="red")
+lines(smooth.spline(fitted(mod3), residuals(mod3,type="normalized")),col="red")
+plot(data.test$SEX,residuals(mod3,type="normalized"))
+plot(data.test$SPAWN,residuals(mod3,type="normalized"))
 #normality
-hist(residuals(mod1))
+hist(residuals(mod3,type="normalized"))
 #independence
-acf(residuals(mod1))
+acf(residuals(mod3,type="normalized"))
 
-####
+#### Total Duration
+
+data.test<-data %>%
+  group_by(TRANSMITTER,SEX,SPAWN) %>%
+  summarise(TOTALDUR= length(CLUSTER))
+
+hist(log10(data.test$FREQ))
+boxplot(FREQ~SEX*SPAWN,data=data.test)
+
+require(lattice)
+
+xyplot(FREQ ~ |TRANSMITTER, groups=SEX, type= c("p", "r"), data=data.test)
+
+mod1<-gls(log(FREQ)~SEX*SPAWN,data=data.test)
+#mixed effects model
+mod2<-lme(log(FREQ)~SEX*SPAWN,random=~1|TRANSMITTER,data=data.test,method="REML")
+
+anova(mod1,mod2)
+
+#check for autocorrelation
+acf(residuals(mod1))#correlation
+mod3<-gls(log(FREQ)~SEX*SPAWN,correlation=corAR1(),data=data.test)
+acf(residuals(mod3,type="normalized"))
+anova(mod1,mod3)
+
+mod3<-gls(log(FREQ)~SEX*SPAWN,correlation=corAR1(),data=data.test, method="ML")
+Anova(mod3,type=3)
+
+
+
+summary(mod3)
+
+
+#check assumptions
+#heterogeneity
+plot(fitted(mod3), residuals(mod3,type="normalized"), xlab = "Fitted Values", ylab = "Residuals")
+abline(h = 0, lty = 2)
+lines(smooth.spline(fitted(mod3), residuals(mod3,type="normalized")),col="red")
+plot(data.test$SEX,residuals(mod3,type="normalized"))
+plot(data.test$SPAWN,residuals(mod3,type="normalized"))
+#normality
+hist(residuals(mod3,type="normalized"))
+#independence
+acf(residuals(mod3,type="normalized"))
+
+
