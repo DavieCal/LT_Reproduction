@@ -25,82 +25,98 @@ require(lme4)
 require(MuMIn)
 require(dplyr)
 require(car)
+require(MASS)
+require(mgcv)
 data.test<-data %>%
   group_by(TRANSMITTER,SEX,SPAWN) %>%
   summarise(FREQ = length(CLUSTER),
             TOTALTIME = sum(TOTALTIME),
-            VISITS = length(uniqiue(SITE)))
+            VISITS = length(unique(SITE)))
 
-hist(log10(data.test$FREQ))
+hist(log(data.test$FREQ))
 boxplot(FREQ~SEX*SPAWN,data=data.test)
 
 require(lattice)
 
-xyplot(FREQ ~ |TRANSMITTER, groups=SEX, type= c("p", "r"), data=data.test)
+xyplot(FREQ ~ SPAWN|TRANSMITTER, groups=SEX, type= c("p", "r"), data=data.test)
 
-mod1<-gls(log(FREQ)~SEX*SPAWN,data=data.test)
+mod1<-glm.nb(FREQ~SEX*SPAWN,data=data.test)
+
 #mixed effects model
-mod2<-lme(log(FREQ)~SEX*SPAWN,random=~1|TRANSMITTER,data=data.test,method="REML")
+mod2<-glmer(FREQ~SEX*SPAWN+(1|TRANSMITTER),family=negative.binomial(1.3),data=data.test)
+#mixed effects model
 
-anova(mod1,mod2)
+mod3<-gamm(FREQ~SEX*SPAWN, random=list(TRANSMITTER=~1),
+              family=negative.binomial(1.3),
+              data=data.test)
 
 #check for autocorrelation
-acf(residuals(mod1))#correlation
-mod3<-gls(log(FREQ)~SEX*SPAWN,correlation=corAR1(),data=data.test)
-acf(residuals(mod3,type="normalized"))
-anova(mod1,mod3)
-
-mod3<-gls(log(FREQ)~SEX*SPAWN,correlation=corAR1(),data=data.test, method="ML")
-Anova(mod3,type=3)
+acf(residuals(mod3$lme))#correlation
 
 
+Anova(mod2,type=3)
 
-summary(mod3)
+
+Anova(mod2,type=3)
+
+plot(allEffects(mod2))
 
 
 #check assumptions
 #heterogeneity
-plot(fitted(mod3), residuals(mod3,type="normalized"), xlab = "Fitted Values", ylab = "Residuals")
+plot(mod3)
+plot(fitted(mod$lme), resid(mod3$lme,type="normalized"), xlab = "Fitted Values", ylab = "Residuals")
 abline(h = 0, lty = 2)
-lines(smooth.spline(fitted(mod3), residuals(mod3,type="normalized")),col="red")
-plot(data.test$SEX,residuals(mod3,type="normalized"))
-plot(data.test$SPAWN,residuals(mod3,type="normalized"))
+lines(smooth.spline(fitted(mod3$lme,type="normalized"), resid(mod3$lme)),col="red")
+plot(data.test$SEX,residuals(mod3))
+plot(data.test$SPAWN,residuals(mod3))
 #normality
-hist(residuals(mod3,type="normalized"))
+hist(residuals(mod3))
 #independence
-acf(residuals(mod3,type="normalized"))
+acf(residuals(mod3))
 
 #### Total Duration
 
-data.test<-data %>%
-  group_by(TRANSMITTER,SEX,SPAWN) %>%
-  summarise(TOTALDUR= length(CLUSTER))
 
-hist(log10(data.test$FREQ))
-boxplot(FREQ~SEX*SPAWN,data=data.test)
+hist(data.test$TOTALTIME)
+qqnorm(resid(mod2))
+boxplot(log(TOTALTIME)~SEX*SPAWN,data=data.test)
 
 require(lattice)
 
-xyplot(FREQ ~ |TRANSMITTER, groups=SEX, type= c("p", "r"), data=data.test)
+xyplot(log(TOTALTIME) ~ SPAWN|TRANSMITTER, groups=SEX, type= c("p", "r"), data=data.test)
 
-mod1<-gls(log(FREQ)~SEX*SPAWN,data=data.test)
+mod1<-gls(log(TOTALTIME)~SEX*SPAWN,data=data.test)
 #mixed effects model
-mod2<-lme(log(FREQ)~SEX*SPAWN,random=~1|TRANSMITTER,data=data.test,method="REML")
+mod2<-lme(log(TOTALTIME)~SEX*SPAWN,random=~1|TRANSMITTER,data=data.test,method="REML")
 
 anova(mod1,mod2)
 
 #check for autocorrelation
-acf(residuals(mod1))#correlation
-mod3<-gls(log(FREQ)~SEX*SPAWN,correlation=corAR1(),data=data.test)
-acf(residuals(mod3,type="normalized"))
-anova(mod1,mod3)
+acf(residuals(mod2))#correlation
 
-mod3<-gls(log(FREQ)~SEX*SPAWN,correlation=corAR1(),data=data.test, method="ML")
-Anova(mod3,type=3)
+mod2<-lme(TOTALTIME~SEX*SPAWN,random=~1|TRANSMITTER,data=data.test,method="REML")
 
+Anova(mod2,type=3)
 
+mod3<-lme(TOTALTIME~SEX*SPAWN,random=~1|TRANSMITTER,
+          weights=varIdent(form=~1|SEX),data=data.test,method="REML")
 
-summary(mod3)
+anova(mod2,mod3)
+
+mod4<-lme(TOTALTIME~SEX+SPAWN,random=~1|TRANSMITTER,data=data.test,method="ML")
+
+anova(mod2,mod3)
+
+mod4<-lme(log(TOTALTIME)~SEX,random=~1|TRANSMITTER,data=data.test,method="ML")
+
+anova(mod3,mod4)
+
+mod5<-lme(log(TOTALTIME)~SPAWN,random=~1|TRANSMITTER,data=data.test,method="ML")
+
+anova(mod3,mod5)
+
+Anova(mod3,type=2)
 
 
 #check assumptions
@@ -115,4 +131,5 @@ hist(residuals(mod3,type="normalized"))
 #independence
 acf(residuals(mod3,type="normalized"))
 
+plot(allEffects(mod3))
 
