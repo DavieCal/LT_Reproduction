@@ -58,7 +58,7 @@ lines(c(peakdates.g13$START-12*60*60,peakdates.g13$START-12*60*60),c(-1,3.5))
 lines(c(peakdates.g13$END+12*60*60,peakdates.g13$END+12*60*60),c(-1,3.5))
 
 #2014 group 2014
-plot(FREQ14/3~DATE,data=spawn.num.14,ylim=c(0,3), main="2014", ylab="Freq per Fish",xlab="",
+plot(FREQ/3~DATE,data=spawn.num.14,ylim=c(0,3), main="2014", ylab="Freq per Fish",xlab="",
      xlim=as.POSIXct(c("2014-08-15","2014-10-15"),format="%Y-%m-%d", tz="MST"),type="h",col="grey",
      lwd=6,lend=2)
 lines(c(peakdates.g14$START-12*60*60,peakdates.g14$START-12*60*60),c(-1,3))
