@@ -160,6 +160,16 @@ mtext("Depth (m)", side=2, line=3, adj=1.2)
 ```
 \newpage
 
+```{r}
+library(MASS)
+df<-fish[fish$DATETIME>="2013-08-15" & fish$DATETIME<="2013-10-15",c("SEX","DEPTH","DATETIME")]
+df<-df[!is.na(df$DEPTH),]
+df$DATETIME<-as.numeric(df$DATETIME)
+# Default call 
+k <- kde2d(df$DATETIME, df$DEPTH, n=50)
+image(k,col=grey.colors(100),ylim=c(32,0))
+```
+
 ```{r, eval=FALSE, echo=FALSE}
 #2012
 #par(mar=c(5.1,4.1,0,2.1))

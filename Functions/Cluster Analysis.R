@@ -573,6 +573,21 @@ points(CLUST.Y~CLUST.X,data=ltspawnclust[ltspawnclust$YEAR==2014,],pch=19,col=rg
 
 ltspawnclust$DATE<-format(ltspawnclust$STARTTIME,"%Y-%m-%d")
 
+
+#assign tags to surgery groups
+group2012<-paste0("LT-",c(1:30))
+group2013<-paste0("LT-",c(31:44))
+group2014<-paste0("LT-",c(45:47))
+
+groups<-data.frame(TRANSMITTER=c(group2012,
+                                 group2013,
+                                 group2014),
+                   GROUP=c(rep("GROUP2012",length(group2012)),
+                            rep("GROUP2013",length(group2013)),
+                            rep("GROUP2014",length(group2014))))
+
+ltspawnclust<-left_join(ltspawnclust,groups)
+
 #all clusters
 spawn.num=NULL
 spawn.num$DATE<-as.POSIXct(names(table(ltspawnclust$DATE)),format="%Y-%m-%d", tz="MST")
@@ -831,8 +846,16 @@ daily<-daily[daily$DATE!="2013-09-24" & daily$DATE!="2013-09-27",]
 
 daily$ACCELMEAN[is.nan(daily$ACCELMEAN)]<-NA
 
-spawntable<- daily %>%
-  #select(MONTH==9) %>%
+daily<-left_join(daily,groups)
+
+new.daily<-daily %>%
+  filter(YEAR=="2012"& GROUP=="GROUP2012" |
+           YEAR=="2013"& GROUP=="GROUP2013" |
+           YEAR=="2014"& GROUP=="GROUP2014"
+           )
+
+spawntable<- new.daily %>%
+  filter(!TRANSMITTER=="LT-32") %>%
     group_by(YEAR,MONTH,SEX) %>%
       summarise(n = length(unique(TRANSMITTER)),
                 STEPLENGTH.MEAN=mean(STEPLENGTH, na.rm=TRUE),
@@ -1043,7 +1066,40 @@ depth15$Depth[depth15$Depth==-1]<-0
 
 
 
+#####suntimes
+require(maptools)
+#create spatial point
+point<-fish[1,c("LAT","LON")]
+coordinates(point)<- ~LON+LAT
+proj4string(point)<-CRS("+proj=longlat +datum=WGS84")
+
+#date sequence
+dateseq= seq.POSIXt(from=as.POSIXct("2013-08-15",tz="MST"),to=as.POSIXct("2013-11-01", tz="MST"),by="day")
+
+#sun times data frame
+suntimes<-data.frame(DATE=dateseq,
+                     SUNRISE=crepuscule(point, dateseq, solarDep = 0, direction="dawn",POSIXct.out=TRUE)$time,
+                     DAWN=crepuscule(point, dateseq, solarDep = 6, direction="dawn",
+                                     POSIXct.out=TRUE)$time,
+                     DUSK=crepuscule(point, dateseq, solarDep = 6, direction= "dusk",
+                                     POSIXct.out=TRUE)$time,
+                     SUNSET=crepuscule(point, dateseq, solarDep = 0, direction="dusk",POSIXct.out=TRUE)$time
+)
+
+suntimes$SUNRISE<-hour(suntimes$SUNRISE)+minute(suntimes$SUNRISE)/60+second(suntimes$SUNRISE)/3600
+
+suntimes$SUNSET<-hour(suntimes$SUNSET)+minute(suntimes$SUNSET)/60+second(suntimes$SUNSET)/3600
+
+suntimes$DAWN<-hour(suntimes$DAWN)+minute(suntimes$DAWN)/60+second(suntimes$DAWN)/3600
+
+suntimes$DUSK<-hour(suntimes$DUSK)+minute(suntimes$DUSK)/60+second(suntimes$DUSK)/3600
+
+
+
+
+
 save(ltspawnclust,dailytemp,first.clust,spawn.num,cluster,shore_outline,
-     daily, spawntable, spawn, mcpclust, all_mcp,mcpoverlap,depth15, file="SpawnClust.RData")
+     daily, spawntable, spawn, mcpclust, all_mcp,mcpoverlap,depth15,new.daily, 
+     dateseq,suntimes,file="SpawnClust.RData")
 save(fishspawn,file="~/Data/fishspawn.RData")
 save(fishbind_all,file="~/Data/fish.RData")

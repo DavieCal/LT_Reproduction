@@ -120,7 +120,7 @@ coordinates(point)<- ~LON+LAT
 proj4string(point)<-CRS("+proj=longlat +datum=WGS84")
 
 #date sequence
-#dateseq= seq.POSIXt(from=as.POSIXct("2013-08-15",tz="MST"),to=as.POSIXct("2013-11-01", tz="MST"),by="day")
+dateseq= seq.POSIXt(from=as.POSIXct("2013-08-15",tz="MST"),to=as.POSIXct("2013-11-01", tz="MST"),by="day")
 
 #sun times data frame
 suntimes<-data.frame(DATE=dateseq,
