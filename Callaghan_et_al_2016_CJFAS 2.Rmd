@@ -32,14 +32,18 @@ Authors: David T.Callaghan^1^*, Paul J. Blanchfield^1,2^, and Peter A. Cott^3^
 
 Collapsed fish populations worldwide have exemplified the susceptibility of natural populations to human disturbance and their subsequent limited ability to recover. It is now evident that fishing is only one of several factors affecting the resilience of collapsed populations. There is a pressing need to incorporate behavioral ecology in conservation efforts to manage and sustain fisheries, and in particular, an in-depth examination of the spatial and temporal scales of mating systems. 
 
-Mining and development in Canada’s North are expected to increase in the near future [@rheaume_2013]. Many of these operations will impact the lakes and waterways that define northern Canada [@cott_2015]. Identification of critical habitat is ian important knowledge gap to the sustainability of an economically, recreationally and culturally important fish species
+Resource development in Canada’s North is expected to increase in the near future [@rheaume_2013]. Many of these operations will impact the lakes and waterways that define northern Canada [@cott_2015]. 
+
+These low productivity lakes often result in fish developing energy-conserving life history strategies, making them particularly vulnerable to northern resource development impacts [@reist_2006] 
+
+Identification of critical habitat is ian important knowledge gap to the sustainability of an economically, recreationally and culturally important fish species
 
 
 and is an key knowledge gap for the managment and conservation of 
 
 "Declining fish populations and failed recoveries worldwide have exemplified the susceptibility of natural populations to collapse and the subsequent limited ability to recover. It is now evident that fishing is only one of several factors impacting the resilience of collapsed populations 1. There is a pressing need to incorporate behavioral ecology in conservation efforts to manage and sustain fisheries, and in particular, an in-depth examination of the spatial and temporal scales of fish mating systems 2" - nserc application"
 
-"In austere, low produc- tivity systems, fish often mature late, grow slowly (Healey 1978; Sullivan 2003), and reproduce less frequently than in productive areas where energetic demands are greater (e.g., Cott et al. 2013). Such energy-conserving life history strategies make northern fishes particularly sensitive to perturbations of their environments, mak- ing them especially vulnerable to impacts from northern resource development (Reist et al. 2006)." - pete cott 2015 direct quote"
+"In austere, low productivity systems, fish often mature late, grow slowly (Healey 1978; Sullivan 2003), and reproduce less frequently than in productive areas where energetic demands are greater (e.g., Cott et al. 2013). Such energy-conserving life history strategies make northern fishes particularly sensitive to perturbations of their environments, making them especially vulnerable to impacts from northern resource development (Reist et al. 2006)." - pete cott 2015 direct quote"
 
 
 Currently there exists little information detailing the reproductive behaviour of lake trout in northern lakes, so it is assumed that observations of lake trout reproduction from the southern extent of their range are similar to northern locales. Because of large climatic differences between southern and northern regions, the use of southern-derived data can be misleading. Northern-specific data on spawning habitat characteristics and use is not only imperative to the sustainability of northern lake trout, but also for taking a proactive and adaptive approach to managing northern fisheries in the future.
@@ -404,6 +408,7 @@ lines(SPAWN~DATE,data=spawn.num,col=rgb(0,0,0,0.7),type="h",lwd=7,lend=1)
 
 lines(c(peakstart-12*60*60,peakstart-12*60*60),c(0,25))
 lines(c(peakend+12*60*60,peakend+12*60*60),c(0,25))
+
 
 axis.POSIXct(1,at=c(dateseq[1],dateseq[18],dateseq[32],dateseq[48],dateseq[62],dateseq[79]),format="%b-%d",pos=0)
 axis(2,las=1,pos=min(dateseq))

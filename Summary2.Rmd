@@ -2,7 +2,7 @@
 title: "Summary"
 author: "David T. Callaghan"
 date: '`r format(Sys.time(), "%d %B, %Y")`'
-output: pdf_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -10,6 +10,8 @@ knitr::opts_chunk$set( echo=FALSE, message=FALSE, warning=FALSE)
 library(printr)
 library(knitr)
 library(dplyr)
+library(lubridate)
+library(scales)
 load("SpawnClust.RData")
 
 ```
@@ -41,28 +43,101 @@ peakdates.g13<-peakdates(date=spawn.num.13$DATE,freq=spawn.num.13$FREQ13)
 peakdates.14<-peakdates(date=spawn.num.14$DATE,freq=spawn.num.14$FREQ) 
 peakdates.g14<-peakdates(date=spawn.num.14$DATE,freq=spawn.num.14$FREQ14)
 
+dailytemp$DATE<-date(dailytemp$DATE)
+
 par(mfrow=c(3,1))
+par(mar=c(5,4,4,4))
 
 #2012
-plot(FREQ/24~DATE,data=spawn.num.12,ylim=c(0,3), main="2012",ylab="Freq per Fish",xlab="",
+plot(FREQ~DATE,data=spawn.num.12[spawn.num.12$DATE<"2012-10-15",],ylim=c(0,60),axes=F, main="2012",ylab=NA,xlab=NA,
      xlim=as.POSIXct(c("2012-08-15","2012-10-15"),format="%Y-%m-%d", tz="MST"),type="h",col="grey",
      lwd=6,lend=2)
-lines(c(peakdates.12$START-12*60*60,peakdates.12$START-12*60*60),c(-1,3.5))
-lines(c(peakdates.12$END+12*60*60,peakdates.12$END+12*60*60),c(-1,3.5))
+
+lines(c(peakdates.12$START-12*60*60,peakdates.12$START-12*60*60),c(0,60))
+lines(c(peakdates.12$END+12*60*60,peakdates.12$END+12*60*60),c(0,60))
+
+axis(1,at=as.POSIXct(c("2012-08-15","2012-10-15"),format="%Y-%m-%d", tz="MST"),
+     lwd=20,col="white",labels=FALSE)
+
+axis.POSIXct(1,spawn.num.12$DATE,
+             at=as.POSIXct(c("2012-08-15","2012-09-01","2012-09-15","2012-10-01","2012-10-15"),format="%Y-%m-%d", tz="MST"),format="%b %d",pos=0)
+
+axis(2,las=1,lwd=0,lwd.ticks=1)
+mtext(side = 2, line = 3, "Frequency per Fish")
+par(new = T)
+plot(TEMP~DATE, type="l", axes=F,lwd=2,
+     xlim=date(c("2012-08-15","2012-10-15")),
+     ylim=c(0,20),
+     xlab=NA, ylab=NA, 
+     col="blue",
+     data=dailytemp[dailytemp$DATE >= "2012-08-15" & 
+                                        dailytemp$DATE <= "2012-10-15",])
+axis(side = 4, col="blue",col.axis="blue",lwd=0,lwd.ticks=1)
+mtext(side = 4, line = 3, expression("Temperature (" * degree * C *")"),col="blue")
+#axis(3,at=date(c("2012-08-15","2012-10-15")),pos=20,labels=FALSE,col.ticks="white")
 
 #2013 group 2013
-plot(FREQ13/9~DATE,data=spawn.num.13,ylim=c(0,3), main="2013", ylab="Freq per Fish",xlab="",
-     xlim=as.POSIXct(c("2013-08-15","2013-10-15"),format="%Y-%m-%d", tz="MST"), type="h",col="grey",
+
+plot(FREQ~DATE,data=spawn.num.13[spawn.num.13$DATE<"2013-10-15",],ylim=c(0,30),axes=F, main="2013",ylab=NA,xlab=NA,
+     xlim=as.POSIXct(c("2013-08-15","2013-10-15"),format="%Y-%m-%d", tz="MST"),type="h",col="grey",
      lwd=6,lend=2)
-lines(c(peakdates.g13$START-12*60*60,peakdates.g13$START-12*60*60),c(-1,3.5))
-lines(c(peakdates.g13$END+12*60*60,peakdates.g13$END+12*60*60),c(-1,3.5))
+
+lines(c(peakdates.g13$START-12*60*60,peakdates.g13$START-12*60*60),c(0,30))
+lines(c(peakdates.g13$END+12*60*60,peakdates.g13$END+12*60*60),c(0,30))
+
+axis(1,at=as.POSIXct(c("2013-08-15","2013-10-15"),format="%Y-%m-%d", tz="MST"),
+     lwd=20,col="white",labels=FALSE)
+
+axis.POSIXct(1,spawn.num.13$DATE,
+             at=as.POSIXct(c("2013-08-15","2013-09-01","2013-09-15","2013-10-01","2013-10-15"),format="%Y-%m-%d", tz="MST"),format="%b %d",pos=0)
+
+axis(2,las=1,lwd=0,lwd.ticks=1)
+mtext(side = 2, line = 3, "Frequency per Fish")
+par(new = T)
+plot(TEMP~DATE, type="l", axes=F,lwd=2,
+     xlim=date(c("2013-08-15","2013-10-15")),
+     ylim=c(0,20),
+     xlab=NA, ylab=NA, 
+     col="blue",
+     data=dailytemp[dailytemp$DATE >= "2013-08-15" & 
+                                        dailytemp$DATE <= "2013-10-15",])
+axis(side = 4, col="blue",col.axis="blue",lwd=0,lwd.ticks=1)
+mtext(side = 4, line = 3, expression("Temperature (" * degree * C *")"),col="blue")
+#axis(3,at=date(c("2012-08-15","2012-10-15")),pos=20,labels=FALSE,col.ticks="white")
+
+
+
+
+
 
 #2014 group 2014
-plot(FREQ/3~DATE,data=spawn.num.14,ylim=c(0,3), main="2014", ylab="Freq per Fish",xlab="",
+
+plot(FREQ~DATE,data=spawn.num.14,ylim=c(0,10),axes=F, main="2014",ylab=NA,xlab=NA,
      xlim=as.POSIXct(c("2014-08-15","2014-10-15"),format="%Y-%m-%d", tz="MST"),type="h",col="grey",
      lwd=6,lend=2)
-lines(c(peakdates.g14$START-12*60*60,peakdates.g14$START-12*60*60),c(-1,3))
-lines(c(peakdates.g14$END+12*60*60,peakdates.g14$END+12*60*60),c(-1,3))
+
+lines(c(peakdates.g14$START-12*60*60,peakdates.g14$START-12*60*60),c(0,10))
+lines(c(peakdates.g14$END+12*60*60,peakdates.g14$END+12*60*60),c(0,10))
+
+axis(1,at=as.POSIXct(c("2014-08-15","2014-10-15"),format="%Y-%m-%d", tz="MST"),
+     lwd=20,col="white",labels=FALSE)
+
+axis.POSIXct(1,spawn.num.13$DATE,
+             at=as.POSIXct(c("2014-08-15","2014-09-01","2014-09-15","2014-10-01","2014-10-15"),format="%Y-%m-%d", tz="MST"),format="%b %d",pos=0)
+
+axis(2,las=1,lwd=0,lwd.ticks=1)
+mtext(side = 2, line = 3, "Frequency per Fish")
+par(new = T)
+plot(TEMP~DATE, type="l", axes=F,lwd=2,
+     xlim=date(c("2014-08-15","2014-10-15")),
+     ylim=c(0,20),
+     xlab=NA, ylab=NA, 
+     col="blue",
+     data=dailytemp[dailytemp$DATE >= "2014-08-15" & 
+                                        dailytemp$DATE <= "2014-10-15",])
+axis(side = 4, col="blue",col.axis="blue",lwd=0,lwd.ticks=1)
+mtext(side = 4, line = 3, expression("Temperature (" * degree * C *")"),col="blue")
+#axis(3,at=date(c("2012-08-15","2012-10-15")),pos=20,labels=FALSE,col.ticks="white")
 
 
 
@@ -116,9 +191,11 @@ Next I plotted the data from the bubble pie graph and created a sorted horizonta
 
 data<-table(ltspawnclust$YEAR,ltspawnclust$SITE)
 data<-data[,order(colSums(data))]
-barplot(data,
+colnames(data)<-c(dim(data)[2]:1)
+df.bar<-barplot(data,
         axes=FALSE,
         xlim=c(0,100),
+        #ylim=c(0,111),
         xlab="Total Spawning Clusters Formed",
         ylab="Spawning Sites",
         axisnames=FALSE,
@@ -133,9 +210,31 @@ barplot(data,
                           horiz=TRUE,
                           border="white")
         )
-axis(1,pos=0)
+axis(1)
 
-  
+sitesums<-cumsum(colSums(data)/sum(colSums(data)))
+s50<-length(sitesums[sitesums<=0.50])
+s95<-length(sitesums[sitesums<=0.05])
+#50% line
+lines(y=c((df.bar[s50]+df.bar[s50-1])/2,(df.bar[s50]+df.bar[s50-1])/2),
+      x=c(0,45),lwd=2)
+lines(y=c((df.bar[s50]+df.bar[s50-1])/2,(df.bar[s50]+df.bar[s50-1])/2),
+      x=c(55,100),lwd=2)
+#abline(h=(df.bar[s95]+df.bar[s95+1])/2)
+#95% line
+lines(y=c((df.bar[s95]+df.bar[s95-1])/2,(df.bar[s95]+df.bar[s95-1])/2),
+      x=c(0,45),lwd=2)
+lines(y=c((df.bar[s95]+df.bar[s95-1])/2,(df.bar[s95]+df.bar[s95-1])/2),
+      x=c(55,100),lwd=2)
+axis(2,
+     at=c(df.bar[1],df.bar[s95],
+          df.bar[s50],df.bar[length(sitesums)]),
+     labels=c(111,80,
+              17,1), 
+     lwd=0,lwd.ticks=1,las=1)
+text(x=50,y=(df.bar[s50]+df.bar[s50-1])/2,"50 %")
+text(x=50,y=(df.bar[s95]+df.bar[s95-1])/2,"95 %")
+
 ```
 \newpage
 Next I created a series of bubble plots for each year where the bubble size represents frequency of use in that year.
@@ -229,11 +328,17 @@ kable(data, col.names=c("Year","Sex","n","Daily Displacement","Std. Dev.",
 
 require(lubridate)
 #select only males or females
-data<-daily[daily$MONTH==9 & (daily$SEX=="M" | daily$SEX=="F") & daily$TRANSMITTER!="LT-32",]
+data<-daily[daily$MONTH==9 & (daily$SEX=="M" | daily$SEX=="F") & daily$TRANSMITTER!="LT-32" & daily$YEAR!=2014,]
+
+#data<-daily[daily$MONTH==9 & (daily$SEX=="M" | daily$SEX=="F") & daily$TRANSMITTER!="LT-32",]
 data$DAY<-day(as.Date(data$DATE))
 data$YEAR<-as.factor(data$YEAR)
+data$YEAR<-droplevels(data$YEAR)
 data$TRANSMITTER<-as.factor(data$TRANSMITTER)
 data$SEX<-as.factor(data$SEX)
+data$SEX<-droplevels(data$SEX)
+#centre days
+data$cDAY<-data$DAY-mean(data$DAY)
 
 
 
@@ -247,6 +352,8 @@ require(lattice)
 require(car)
 library(effects)
 library(stargazer)
+require(lsmeans)
+
 ```
 #Daily Displacement
 
@@ -298,10 +405,15 @@ mod2<-lme(sqrt(STEPLENGTH)~SEX+cDAY+I(cDAY^2)+YEAR, random=~1|TRANSMITTER, corre
 #acf(residuals(mod2, type="normalized"))#looks pretty good
 
 
+
 #re-run model 2 with maximum likelihood (ML)
 mod2<-lme(sqrt(STEPLENGTH)~SEX+cDAY+I(cDAY^2)+YEAR, random=~1|TRANSMITTER, correlation=corAR1(form=~1|TRANSMITTER/YEAR) ,data=data, method="ML")
 
 #summary(mod2)
+
+
+lsmeans(mod2, pairwise~SEX)
+anova(mod2,type="marginal")
 
 
 #drop SEX
@@ -471,7 +583,7 @@ data.ac<-data.ac[!is.na(data.ac$ACCELMEAN),]
 #boxplot(log(ACCELMEAN)~SEX,data.ac)
 ```
 ```{r}
-xyplot(log(ACCELMEAN) ~ DAY|TRANSMITTER, group=YEAR, type= c("p", "smooth"), data=data.ac)
+xyplot(log(ACCELMEAN) ~ DAY|TRANSMITTER, type= c("p", "smooth"), data=data.ac)
 ```
 
 I also ran the same mixed model parameters for daily mean acceleration but need to adjust the random component to transmitter since we only had two years of accelerometer data. The results show that there is a significant difference (although not very convincing...) between sexes in terms of acceration with significant changes among days^2 but not days or years.
@@ -480,9 +592,9 @@ I also ran the same mixed model parameters for daily mean acceleration but need 
 
 #test if random effect better than linear regression
 #linear model
-gls1<-gls(log(ACCELMEAN)~SEX+cDAY+I(cDAY^2)+YEAR,data=data.ac)
+gls1<-gls(log(ACCELMEAN)~SEX+cDAY+I(cDAY^2),data=data.ac)
 #mixed effects model
-mod1<-lme(log(ACCELMEAN)~SEX+cDAY+I(cDAY^2)+YEAR, random=~1|TRANSMITTER,data=data.ac, method="REML")
+mod1<-lme(log(ACCELMEAN)~SEX+cDAY+I(cDAY^2), random=~1|TRANSMITTER,data=data.ac, method="REML")
 
 #check variance inflation
 #vif(mod1)
@@ -493,7 +605,7 @@ mod1<-lme(log(ACCELMEAN)~SEX+cDAY+I(cDAY^2)+YEAR, random=~1|TRANSMITTER,data=dat
 #acf(residuals(mod1, type="normalized"))#looks like correlation
 
 #add AR1 correlation structure to model
-mod2<-lme(log(ACCELMEAN)~SEX+cDAY+I(cDAY^2)+YEAR, random=~1|TRANSMITTER, correlation=corAR1(form=~1|TRANSMITTER) ,data=data.ac, method="REML")
+mod2<-lme(log(ACCELMEAN)~SEX+cDAY+I(cDAY^2), random=~1|TRANSMITTER, correlation=corAR1(form=~1|TRANSMITTER) ,data=data.ac, method="REML")
 
 #the AR1 model is a better fit then the model without the correlation structure
 #anova(mod1,mod2)
@@ -501,7 +613,9 @@ mod2<-lme(log(ACCELMEAN)~SEX+cDAY+I(cDAY^2)+YEAR, random=~1|TRANSMITTER, correla
 #re-check autocorrelation
 #acf(residuals(mod2, type="normalized"))#looks pretty good
 
-mod2<-lme(log(ACCELMEAN)~SEX+cDAY+I(cDAY^2)+YEAR, random=~1|TRANSMITTER, correlation=corAR1(form=~1|TRANSMITTER) ,data=data.ac, method="ML")
+mod2<-lme(log(ACCELMEAN)~SEX+cDAY+I(cDAY^2), random=~1|TRANSMITTER, correlation=corAR1(form=~1|TRANSMITTER) ,data=data.ac, method="ML")
+
+mod2<-lme(log(ACCELMEAN)~SEX, random=~1|TRANSMITTER, correlation=corAR1(form=~1|TRANSMITTER) ,data=data.ac, method="ML")
 
 #test significance of intereaction
 #mod2.a<-update(mod2,.~.-SEX)# drop interaction
@@ -525,7 +639,9 @@ best.ac<-mod2.d
 #mod.ac<-update(mod.ac,.~.-YEAR)
 
 #r.squaredGLMM(mod.ac)
-kable(Anova(mod.ac,type=2))
+kable(anova(mod.ac,type="marginal"))
+
+
 #check assumptions
 #heterogeneity
 #plot(fitted(mod.ac), residuals(mod.ac, type="normalized"), xlab = "Fitted Values", ylab = "Residuals")

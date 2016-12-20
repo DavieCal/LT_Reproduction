@@ -1,8 +1,9 @@
 ---
 csl: canadian-journal-of-fisheries-and-aquatic-sciences.csl
 output:
-  pdf_document: default
   html_document:
+    fig_caption: yes
+  pdf_document:
     fig_caption: yes
   word_document:
     fig_caption: yes
@@ -15,31 +16,1035 @@ Title: Lake trout (*Savelinus namaycush*) reproductive behaviour in a northern l
 Authors: David T.Callaghan^1^*, Paul J. Blanchfield^1,2^, and Peter A. Cott^3^
 
 ^1^Department of Biological Sciences, University of Manitoba, 50 Sifton Road, Winnipeg, MB R3T 2N2, Canada
+
 ^2^ Freshwater Institute, Fisheries and Oceans Canada, 501 University Crescent, Winnipeg, MB, R3T 2N6, Canada 
+
 ^3^ Cumulative Impact Monitoring Program - Environment and Natural Resources, Government of the Northwest Territories, Box 1320, Yellowknife, Northwest Territories X1A 2L9, Canada.
 
 *Corresponding Author Email: callagdt@myumanitoba.ca
 
+\newpage
 
 ##Abstract
 
-This thesis investigates lake trout (*Salvelinus namaycush*) reproduction northern lakes. Lake trout have a broad distribution across Canada's North, yet most studies that describe reproductive habitat are from the southern extent of their range. I first assessed whether lake trout spawning habitat, typically characterized as wave-swept shoals with clean cobble that face predominant wind directions, is similar for a northern lake. Specifically, I examined a dozen sites around Alexie Lake, Northwest Territories, to test if physical habitat and wind exposure were important determinants of spawning site use and embryonic survival. Spawning occurred in ~2 m water depth, on 3–15 cm diameter clean substrate found on the leading edge of shoals that ended in a rock crib rising abruptly in nearshore regions around the lake. Wind direction was predominantly from the west, although it was highly variable within and among spawning seasons. I found evidence of lake trout spawning at each site examined, but not limited to shoals facing a predominate wind direction. High variation in embryonic survival (2–83%) from incubation trays was observed among spawning sites, suggesting a large gradient in habitat quality exists within a given lake. Modelled wind exposure did not predict embryonic survival, nor did physical characteristics that may influence interstitial water flow on spawning shoals. 
-  I also provide a detailed description of the lake trout mating system at the whole lake scale in a typical northern boreal lake. Using an acoustic telemetry monitoring system and a novel spatial temporal clustering analysis, I was able to quantify lake trout spawning movements and behaviours over the course of an entire spawning season. Lake trout were found to cluster on spawning shoals virtually around the entire nearshore region of Alexie Lake, as well as around several islands, which appears to further confirm previous findings that subtable spawning habitat is abundant in Alexie Lake. Males arrived earlier than females and spent longer durations on spawning shoals over the course of the spawning season. Males formed >4 times as many spawing clusters and visited more sites than females. Spawning clusters predominantly were formed at night but were also observed during daylight hours, especially during the peak spawning season. I found males may exert more energy than females during the spawning season, with males showing higher activity rates and longer periods spent on spawning shoals than females, in spite of similar daily travel distances between sexes. Overall, females performed more linear movements over the course of the spawning season suggesting a searching behaviour, while males were less persitent and more random in there movements. Our findings challenge the conventional role of wind as a predominant predictor of lake trout spawning site quality. We propose that the unpredictable nature of wind and abundance of suitable habitat may favour lake-wide spawning by lake trout as a bet-hedging strategy in northern lakes with limited fetch.
 
 ##Introduction  
 
-  The evolution of animal mating systems is mainly influenced by sexual selection [@andersson_sexual_1994], parental care [@trivers_parental_1972] and the spatial temporal distribution of resources and mates [@emlen_ecology_1977]. In many species, males optimize their fitness by mating with multiple females. By contrast, the optimal mating rate of females is limited by the production of progeny per mating event [@bateman_intra_1948]. This high energetic investment in gametes by females relative to males often results in conventional sex roles, whereby females provide parental care and males compete for access to females [@kokko_parental_2008]. Because parental care is uncommon in fishes [only found in 21% of families; @blumer_bibliography_1982], their mating systems are ultimately shaped by the distribution of resources necessary for each sex to ensure successful reproduction [@emlen_ecology_1977].  
-  
-Salmonine fishes (salmons, trouts and chars) are typically observed in a site-based competitive mating system where males compete for access to females, which is thought to be the limiting resource [@gross_sunfish_1984], while females compete for territories to establish and prepare their spawning sites [@fleming_pattern_1998]. Females construct a nest (a series of pits termed a redd) and deposit eggs that are fertilized externally by one or more males. Limited numbers of suitable spawning sites and variability in spawning site quality results in females becoming very selective when choosing their nest sites [@blanchfield_relative_2005; @esteve_observations_2005; @degaudemar_sexual_1998]. Males will fight for proximity to females, with body size and exagerated body shape being the main factors in establishing dominance hierarchies [@fleming_breeding_1994; @quinn_effects_1994]. Paternity tests have shown that the closest male to the female generally fertilizes the greatest proportion of eggs [@blanchfield_breeding_2003; @mjolnerod_mate_1998], thus proximity to females increases fertilization success. As a result, male reproductive success is maximized quantitatively, by mating with as many females as possible; whereas female reproductive success is maximized qualitatively, by choosing high quality nest sites and males  [@degaudemar_sexual_1998].  
+Resource development in Canada’s North is expected to increase in the near future [@rheaume_2013]. Many of these operations will impact the lakes and waterways that define northern Canada [@cott_2015]. Low productivity in northern lakes often results in fish species employing energy conserving life history strategies such as late maturation, slow growth and skipped spawning [@insert_ref]; making these species especiially sensititve to habitat disturbance and vulnerbale to the impacts of resource development [@insert_ref]. Identification of critical habitat is an important knowledge gap to the sustainability of economically, recreationally and culturally important northern fish species [@christiansen_2013]. Further, there is a pressing need to incorporate behavioral ecology in conservation efforts to manage and sustain fisheries---in particular, an in-depth examination of the spatial and temporal scales of mating systems[@rowe_2003]. 
 
-  The reproductive behaviours of lake trout (*Salvelinus namaycush*) sharply contrasts the typical salmonine mating system described above [@gunn_spawning_1995; @esteve_lake_2008; @muir_lake_2012]. Spawning usually takes place in lakes on waveswept shoals, and unlike all other salmonines, lake trout do not provide any parental care [i.e., no redd is constructed by the female; @martin_lake_1980]. Eggs are spawned directly onto clean substrate, where they fall into interstitial spaces and incubate for several months before emerging [@royce_breeding_1951]. Lake trout also do not displayovert male-male agonistic behaviour [@royce_breeding_1951; @gunn_spawning_1995; @esteve_lake_2008], a predominant behavioural characteristic of the Salmoninae subfamily [@esteve_observations_2005]. Further, females do not show territorial behaviour (i.e. redd defence) or obvious mate selection [@esteve_lake_2008]. However, some similarities do occur in mating behaviour between lake trout and other salmonines, including males arriving earlier on breeding grounds and staying longer than females each year [@miller_observations_1948; @royce_breeding_1951; @martin_lake_1980; @muir_lake_2012]. In the absence of a site-based competitive mating system and parental care, mating system theory predicts that female reproductive success is driven by habitat quality and mate selection, whereas male reproductive success should be driven by spawning frequency [@degaudemar_sexual_1998]. 
+  Lake trout (*Salvelinus namaycush*) are a long lived, iteroparous species [@gunn_spawning_1995] with an extensive northern distribution [@sawatzky_2007]. Spawning typically occurs in lakes during the fall [@gunn_spawning_1995], with migration from the offshore summer refuge onto nearshore spawning shoals generally coinciding with surface water temperatures declining to 12&deg; C or lower [@redick_review_1967]. Preferred spawning habitat is selected along exposed shorelines off points, islands or on mid-lake shoals containing clean substrate including pebble and cobble mainly 3-15 cm in diameter [@martin_lake_1980; @callaghan_2016]. Spawning predominately occurs during night time [@gunn_spawning_1995] but has been observed during the day [@esteve_lake_2008; @muir_lake_2012; @binder_new_2015]. Males often constitute 60–85% of annual spawning populations, resulting in highly skewed sex ratios on spawning shoals. This imbalance is thought to be a product of earlier maturation, early arrival and longer duration on spawning grounds and the increased likelihood of males spawning each year [@miller_observations_1948; @eschmeyer_reproduction_1955; @martin_reproduction_1957].
   
-  Lake trout (*Salvelinus namaycush*) are a long lived, iteroparous species that typically spawn in lakes during the fall [@gunn_spawning_1995]. Migration from the offshore summer refuge onto nearshore spawning shoals generally coincides with surface water temperatures declining to 12&deg; C or lower [@redick_review_1967]. Preferred spawning habitat is selected along exposed shorelines off points, islands or on mid-lake shoals containing clean substrate including pebble and cobble mainly 3-15 cm in diameter [@martin_lake_1980; See Chapter 2]. Spawning predominately occurs during night time [@gunn_spawning_1995] but has been observed during the day [@esteve_lake_2008; @muir_lake_2012; @binder_new_2015]. Males often constitute 60–85% of annual spawning populations,,, resulting in highly skewed sex ratios on spawning shoals. This imbalance is thought to be a product of earlier maturation, early arrival and longer duration on spawning grounds and the increased likelihood of males spawning each year [@miller_observations_1948; @eschmeyer_reproduction_1955; @martin_reproduction_1957].
-
-  Lake trout reproductive behaviour is relatively understudied when compared to other salmonines, and what literature exists is largely from the southern extent of it's geographic range [@muir_lake_2012]. In general, information on the timing of movement onto spawning shoals and the degree of movements among spawning sites for males and females at seasonal and daily scales remains an important knowledge gap. Furthermore, few studies have investigated reproductive strategies of lake trout [@esteve_lake_2008; @muir_lake_2012]. 
+  The reproductive behaviours of lake trout sharply contrast the typical salmonine mating system [@gunn_spawning_1995; @esteve_lake_2008; @muir_lake_2012]. Spawning usually takes place in lakes on waveswept shoals, and unlike all other salmonines, lake trout do not provide any parental care [i.e., no redd is constructed by the female; @martin_lake_1980]. Eggs are spawned directly onto clean substrate, where they fall into interstitial spaces and incubate for several months before emerging [@royce_breeding_1951]. Lake trout also do not display overt male-male agonistic behaviour [@royce_breeding_1951; @gunn_spawning_1995; @esteve_lake_2008], a predominant behavioural characteristic of the Salmoninae subfamily [@esteve_observations_2005]. Further, females do not show territorial behaviour (i.e. redd defence) or obvious mate selection [@esteve_lake_2008]. However, some similarities do occur in mating behaviour between lake trout and other salmonines, including males arriving earlier on breeding grounds and staying longer than females each year [@miller_observations_1948; @royce_breeding_1951; @martin_lake_1980; @muir_lake_2012].
   
-The objectives of this manuscript is three-fold: (i) to determine when and where lake trout spawn in a typical northern boreal lake; (ii) to describe sex-specific timing and movements of lake trout over the duration of a spawning season; and (iii) to test whether male and female lake trout employ a bet-hedging strategy by spawning on multiple sites. Using data collected from a whole-lake acoustic telemetry array, I will present the movements of five male and six female lake trout over the course of the 2013 spawning season. A spatial temporal clustering analysis was used to determine when and where lake trout formed spawning clusters. These data reveal new insights into the reproductive strategies of male and female lake trout and further our knowledge on spawning site use for managing this iconic Canadian fish species.
+  Lake trout reproductive behaviour is relatively understudied when compared to other salmonines, and what literature exists is largely from the southern extent of it's geographic range [@muir_lake_2012]. In general, information on the timing of movement onto spawning shoals and the degree of movements among spawning sites for males and females at seasonal and daily scales remains an important knowledge gap. Here we provide a detailed description of the seasonality of lake trout spawning movements and site use. The objectives of this manuscript are two-fold: (i) to determine when and where lake trout spawn in a typical northern boreal lake; and  (ii) to describe sex-specific timing and movements of lake trout over the duration of a spawning season. Using data collected from a whole-lake acoustic telemetry array, I will present the movements of male and female lake trout over the course of the three spawning seasons. A spatial temporal clustering analysis was used to determine when and where lake trout formed spawning clusters. These data reveal new insights into the reproductive strategies of male and female lake trout and further our knowledge on spawning site use for managing this iconic Canadian fish species.
   
 ##Methods  
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE}
+library(printr)
+library(knitr)
+library(dplyr)
+library(lubridate)
+library(scales)
+#for figure and table numbers
+library(captioner)
+figs<-captioner(prefix="Figure")
+tabs<-captioner(prefix="Table")
+
+
+load("SpawnClust.RData")
+load("~/Data/fishspawn.RData")
+load("~/Data/fish.RData")
+fish<-fishbind_all
+depth15$Date<-ymd(depth15$Date,tz="MST")
+dailytemp$DATE<-ymd(dailytemp$DATE,tz="MST")
+
+```
+###Study Site
+
+  The study was conducted in Alexie Lake (62&deg; 40' N, 114&deg; 05' W), located approximately 30 km northeast of Yellowknife, Northwest Territories, Canada (Fig. 1). Alexie Lake is a medium size (area: 402 ha, maximum depth: 32 m, mean depth: 11.7 m) oligotrophic lake, possessing 35 islands and a shorelength of 28 km. Stratifcation occurs during the summer until September when the lake becomes isothermal [@healey_experimental_1973; @cott_diel_2015]. Alexie Lake contains four large bodied species; lake trout, northern pike (*Esox lucius*), lake whitefish (*Coregonus clupeaformis*) and burbot (*Lota lota*) as well as numerous prey species [see @cott_food_2011]. Alexie Lake is a designated research lake that is closed to fishing.
+
+####figure 1 - map of alexie
+
+###Lake water temperature
+
+  Water temperature in Alexie Lake was recorded hourly on HOBO&reg; Pendant&trade; temperature loggers (Onset&reg; Computer Corporation, Borne, MA) set in the deepest basin at 0.5 m, at 1 m depth intervals from 1 m to 20 m and at 25 m and 30 m below the water surface. Mean daily temperature for each depth was calculated followed by a spline interpolation to obtain temperatures for every 0.1 m depth interval from lake surface to bottom. Interpolated daily temperature profiles were used to estimate water temperatures occupied by lake trout impanted with pressure-sensing telemetry transmitters [see@guzzo_resource_2016; @plumb_performance_2009], and determine the role of water temperature in the annual timing of spawning.
+
+
+###Lake bathymetry
+
+  A high-resolution hydroacoustic survey was conducted in June 2012 (Milne Technologies, Keene, ON, Canada) producing a detailed bathymetric raster (2.5 x 2.5 m). Hydroacoustic data were collected using a 120 kHz Simrad EK60 7.0&deg; split-beam echo sounder system following a systematic parallel survey design with transects 25 m apart [for details see @cott_diel_2015]. These data were used to determine the bathymetric depth for each lake trout telemetry position (see below). This in conjunction with the pressure sensor reading (see below) allows the determination of fish depth from the lake bottom. 
+
+##Results
+
+
+
+```{r, echo=FALSE, include=FALSE,message=FALSE, warning=FALSE,cache=TRUE}
+require(mixtools)
+data<-filter(fishspawn,YEAR=="2013")
+fit<-normalmixEM(data$SHOREDIST[data$SEX=="F" & !is.na(data$SHOREDIST)],lambda=c(0.10,0.30,0.30,0.20,0.10),mu=c(30,80,140,190,250),sigma=c(5,15,15,25,25))
+peaks_dist_F<-fit$mu
+
+
+fit<-normalmixEM(data$SHOREDIST[data$SEX=="M" & !is.na(data$SHOREDIST)],lambda=c(0.2,0.2,0.30,0.20,0.1),mu=c(15,60,140,210,300),sigma=c(5,20,20,40,40))
+peaks_dist_M<-fit$mu
+
+fit<-normalmixEM(data$DEPTH[data$SEX=="F" & !is.na(data$DEPTH)],lambda=c(0.40,0.60),mu=c(2,12),sigma=c(2,5))
+peaks_depth_F<-fit$mu
+
+fit<-normalmixEM(data$DEPTH[data$SEX=="M" & !is.na(data$DEPTH)],lambda=c(0.40,0.60),mu=c(1,12),sigma=c(1,3))
+peaks_depth_M<-fit$mu
+
+fit<-normalmixEM(data$BOTTOMDEPTH[data$SEX=="F" & !is.na(data$BOTTOMDEPTH)],lambda=c(0.2,0.6,0.2),mu=c(5,19,30),sigma=c(5,10,5))
+peaks_cont_F<-fit$mu
+
+
+fit<-normalmixEM(data$BOTTOMDEPTH[data$SEX=="M" & !is.na(data$BOTTOMDEPTH)],lambda=c(0.3,0.7),mu=c(1,17),sigma=c(1,4))
+peaks_cont_M<-fit$mu
+
+
+```
+###Spatial distribution of lake trout
+
+  The migration of both male and female lake trout from the deeper offshore to shallower nearshore regions of Alexie Lake corresponded to the breakdown of the 15&deg;C isocline (August 29, 2013; Fig. 2). A clear bimodal depth distribution was apparent for both males and females during the spawning season, with males distributed around mean depths of `r round(peaks_depth_M[1])` m  and `r round(peaks_depth_M[2])` m and females distributed around mean depths `r round(peaks_depth_F[1])` m and `r round(peaks_depth_F[2])` m. Telemetry-tagged male lake trout occupied areas of Alexie Lake where mean lake depths were `r round(peaks_cont_M[1])` m and `r round(peaks_cont_M[2])` m while females occupied mean lake depths of `r round(peaks_cont_F[1])` m, `r round(peaks_cont_F[2])` m, and `r round(peaks_cont_F[3])` m (Fig. 3).
+
+
+```{r depthdist, echo=FALSE, message=FALSE, fig.height=7, fig.width=6, fig.cap=figs("depthdist", caption="Depth distribution of males (A) and females (B) during the spawning season in Alexie Lake, NWT. The black line represents the 15&deg; C isocline. Points were given transparency value of 5%, therefore the darker the colour the higher the density of points. No data is available between September 25-27, 2013, while the VPS was removed from the lake for download")}
+
+
+#        add depth distibution on end of plots      #
+
+par(mfrow=c(2,1))
+par(mar=c(0,4.1,4.1,2.1))
+#5.1 4.1 4.1 2.1
+#males
+plot(DEPTH~DATETIME,data=fish[fish$DATETIME>="2013-08-15" & fish$DATETIME<="2013-10-15",],
+     main="",
+     xlab="",
+     ylab="",
+     type="n",
+     bty="n",
+     axes=FALSE,
+     ylim=c(32,0))
+
+axis(2,las=1)
+box()
+
+points(DEPTH~DATETIME,data=fish[fish$DATETIME>="2013-08-15"  & fish$DATETIME<="2013-10-15" & fish$SEX=="M",],
+       col=rgb(0,0,1,0.05),pch=15)
+lines(Depth~Date,data=depth15, lwd=4)
+text(as.numeric(as.POSIXct("2013-08-15", tz="MST")),0.5,"(A)", font=2)
+
+#females
+par(mar=c(5.1,4.1,0,2.1))
+plot(DEPTH~DATETIME,data=fish[fish$DATETIME>="2013-08-15" & fish$DATETIME<="2013-10-15",],
+     main="",
+     xlab="",
+     ylab="",
+     type="n",
+     bty="n",
+     axes=FALSE,
+     ylim=c(32,0))
+
+axis.POSIXct(1,at=c(as.POSIXct("2013-08-15", tz="MST"),as.POSIXct("2013-09-01",tz="MST") ,as.POSIXct("2013-09-15", tz="MST"),as.POSIXct("2013-10-01", tz="MST"),as.POSIXct("2013-10-15", tz="MST")),
+             format="%d %b")
+axis(2,las=1)
+box()
+
+points(DEPTH~DATETIME,data=fish[fish$DATETIME>="2013-08-15"  & fish$DATETIME<="2013-10-15" & fish$SEX=="F",],
+       col=rgb(1,0,0,0.05),pch=15)
+lines(Depth~Date,data=depth15, lwd=4)
+text(as.numeric(as.POSIXct("2013-08-15", tz="MST")),0.5,"(B)", font=2)
+mtext("Depth (m)", side=2, line=3, adj=1.2)
+
+
+```
+\newpage
+
+```{r, eval=FALSE, echo=FALSE}
+#2012
+#par(mar=c(5.1,4.1,0,2.1))
+plot(DEPTH~DATETIME,data=fish[fish$DATETIME>="2012-08-15" & fish$DATETIME<="2012-10-15",],
+     main="2012",
+     xlab="",
+     ylab="",
+     type="n",
+     bty="n",
+     axes=FALSE,
+     ylim=c(32,0))
+
+axis.POSIXct(1,at=c(as.POSIXct("2012-08-15", tz="MST"),as.POSIXct("2012-09-01",tz="MST") ,as.POSIXct("2012-09-15", tz="MST"),as.POSIXct("2012-10-01", tz="MST"),as.POSIXct("2012-10-15", tz="MST")),
+             format="%d %b")
+axis(2,las=1)
+box()
+
+points(DEPTH~DATETIME,data=fish[fish$DATETIME>="2012-08-15"  & fish$DATETIME<="2012-10-15",],
+       col=rgb(0,0,0,0.01),pch=15)
+lines(Depth~Date,data=depth15, lwd=4)
+lines(TEMP~DATE,data=dailytemp, lwd=4,col="red")
+text(as.numeric(as.POSIXct("2013-08-15", tz="MST")),0.5,"(B)", font=2)
+mtext("Depth (m)", side=2, line=3, adj=1.2)
+
+#2013
+#par(mar=c(5.1,4.1,0,2.1))
+plot(DEPTH~DATETIME,data=fish[fish$DATETIME>="2013-08-15" & fish$DATETIME<="2013-10-15",],
+     main="2013",
+     xlab="",
+     ylab="",
+     type="n",
+     bty="n",
+     axes=FALSE,
+     ylim=c(32,0))
+
+axis.POSIXct(1,at=c(as.POSIXct("2013-08-15", tz="MST"),as.POSIXct("2013-09-01",tz="MST") ,as.POSIXct("2013-09-15", tz="MST"),as.POSIXct("2013-10-01", tz="MST"),as.POSIXct("2013-10-15", tz="MST")),
+             format="%d %b")
+axis(2,las=1)
+box()
+
+points(DEPTH~DATETIME,data=fish[fish$DATETIME>="2013-08-15"  & fish$DATETIME<="2013-10-15",],
+       col=rgb(0,0,0,0.01),pch=15)
+lines(Depth~Date,data=depth15, lwd=4)
+lines(TEMP~DATE,data=dailytemp, lwd=4,col="red")
+text(as.numeric(as.POSIXct("2013-08-15", tz="MST")),0.5,"(B)", font=2)
+mtext("Depth (m)", side=2, line=3, adj=1.2)
+
+
+#2014
+#par(mar=c(5.1,4.1,0,2.1))
+plot(DEPTH~DATETIME,data=fish[fish$DATETIME>="2014-08-15" & fish$DATETIME<="2014-10-15",],
+     main="2014",
+     xlab="",
+     ylab="",
+     type="n",
+     bty="n",
+     axes=FALSE,
+     ylim=c(32,0))
+
+axis.POSIXct(1,at=c(as.POSIXct("2014-08-15", tz="MST"),as.POSIXct("2014-09-01",tz="MST") ,as.POSIXct("2014-09-15", tz="MST"),as.POSIXct("2014-10-01", tz="MST"),as.POSIXct("2014-10-15", tz="MST")),
+             format="%d %b")
+axis(2,las=1)
+box()
+
+points(DEPTH~DATETIME,data=fish[fish$DATETIME>="2014-08-15"  & fish$DATETIME<="2014-10-15",],
+       col=rgb(1,0,0,0.01),pch=15)
+lines(Depth~Date,data=depth15, lwd=4)
+lines(TEMP~DATE,data=dailytemp, lwd=4,col="red")
+text(as.numeric(as.POSIXct("2014-08-15", tz="MST")),0.5,"(B)", font=2)
+mtext("Depth (m)", side=2, line=3, adj=1.2)
+
+
+```
+\newpage
+```{r  figure_3, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="**Fig. 3:** Kernel density estimate of bottom contour depth occupied by male (blue) and female (red) lake trout in Alexie Lake, NWT, between August 30 and September 30, 2013."}
+
+#Depth Contour
+data<-filter(fishspawn,YEAR=="2013")
+## calculate the density - don't plot yet
+densFemale_Spawn <- density(data$BOTTOMDEPTH[data$SEX=="F"],from=0)
+densMale_Spawn<- density(data$BOTTOMDEPTH[data$SEX=="M"],from=0)
+
+max_cont_F<-densFemale_Spawn$x[densFemale_Spawn$y==max(densFemale_Spawn$y)]
+max_cont_M<-densMale_Spawn$x[densMale_Spawn$y==max(densMale_Spawn$y)]
+
+
+
+## calculate the range of the graph
+xlim <- range(0,32)
+ylim <- range(0,0.1)
+#pick the colours
+FemaleCol <- rgb(1,0,0,0.5)
+MaleCol <- rgb(0,0,1,0.5)
+## plot the carrots and set up most of the plot parameters
+plot(densMale_Spawn, xlim = xlim, ylim = ylim, 
+     xlab = 'Depth Contour',
+     main = "",
+     type="n",
+     bty="n",
+     axes=FALSE
+)
+
+#put our density plots in
+polygon(c(densMale_Spawn$x,rev(densMale_Spawn$x)),c(densMale_Spawn$y,rep(0,512)), density = -1, col = MaleCol, border = "blue")
+polygon(c(densFemale_Spawn$x,rev(densFemale_Spawn$x)),c(densFemale_Spawn$y,rep(0,512)), density = -1, col = FemaleCol, border = "red")
+
+
+# Draw our own x-axis
+axis(1,pos=0)
+axis(1,at=xlim,labels=c("",""),pos=0,lwd.ticks=0)
+
+axis(2,las=1,pos=0)
+
+
+## add a legend in the corner
+legend("topright",c('Male', "Female"),
+       fill = c(MaleCol,FemaleCol), bty = 'n',
+       border = NA)
+
+#abline(v=4)
+```
+\newpage
+
+The spatial distribution of lake trout in Alexie Lake differed between sexes during the 2013 spawning season. Males had a higher density of detections in the nearshore region than females (Fig. 4). Males exhibited a clear peaked mode at a mean distance from shore of `r round(peaks_dist_M)[1]` m, and a second distinct mode at a mean distance from shore of `r round(peaks_dist_M)[3]` m (Fig. 4). Female lake trout exhibited three major modes at mean distances from shore of `r round(peaks_dist_F)[1]` m, `r round(peaks_dist_F)[2]` m, and `r round(peaks_dist_F)[3]` m, but none showed the same high density as males (Fig. 4). 
+  
+
+```{r figure_4,echo=FALSE, message=FALSE, fig.cap="**Fig. 4:** Kernel density estimate (KDE) of  distance to nearest shore occupied by male (blue) and female (red) lake trout in Alexie Lake, NWT, between August 30 and September 30, 2013."}
+
+data<-filter(fishspawn,YEAR=="2013")
+#Nearshore
+densFemale_Spawn <- density(data$SHOREDIST[data$SEX=="F"],from=0)
+densMale_Spawn<- density(data$SHOREDIST[data$SEX=="M"],from=0)
+max_dist_F<-densFemale_Spawn$x[densFemale_Spawn$y==max(densFemale_Spawn$y)]
+max_dist_M<-densMale_Spawn$x[densMale_Spawn$y==max(densMale_Spawn$y)]
+
+## calculate the range of the graph
+xlim <- range(0,450)
+ylim <- range(0,0.012)
+#pick the colours
+FemaleCol <- rgb(1,0,0,0.5)
+MaleCol <- rgb(0,0,1,0.5)
+## plot the carrots and set up most of the plot parameters
+plot(densMale_Spawn, xlim = xlim, ylim = ylim, 
+     xlab = 'Distance to shore',
+     main="",
+     type="n",
+     bty="n",
+     axes=FALSE
+)
+
+#put our density plots in
+polygon(c(densMale_Spawn$x,rev(densMale_Spawn$x)),c(densMale_Spawn$y,rep(0,512)), density = -1, col = MaleCol, border = "blue")
+polygon(c(densFemale_Spawn$x,rev(densFemale_Spawn$x)),c(densFemale_Spawn$y,rep(0,512)), density = -1, col = FemaleCol, border = "red")
+
+
+# Draw our own x-axis
+axis(1,pos=0)
+axis(1,at=xlim,labels=c("",""),pos=0,lwd.ticks=0)
+
+axis(2,las=1,pos=0)
+
+
+## add a legend in the corner
+legend("topright",c('Male', "Female"),
+       fill = c(MaleCol,FemaleCol), bty = 'n',
+       border = NA)
+```
+```{r spawn_time, echo=FALSE, message=FALSE, warning=FALSE ,fig.height=9, fig.width= 8.5}
+require(scales)
+
+
+spawn.num.12<-spawn.num[spawn.num$YEAR==2012,]
+spawn.num.13<-spawn.num[spawn.num$YEAR==2013,]
+spawn.num.14<-spawn.num[spawn.num$YEAR==2014,]
+
+
+peakdates<-function(date,freq){
+  data<-data.frame(DATE=date,
+                    FREQ=freq)
+  peak<-data.frame(START=min(data$DATE[data$FREQ>=(max(data$FREQ)/2)]),
+                   END=max(data$DATE[data$FREQ>=(max(data$FREQ)/2)]))
+  
+}
+
+peakdates.12<-peakdates(date=spawn.num.12$DATE,freq=spawn.num.12$FREQ)
+peakdates.13<-peakdates(date=spawn.num.13$DATE,freq=spawn.num.13$FREQ)
+peakdates.g13<-peakdates(date=spawn.num.13$DATE,freq=spawn.num.13$FREQ13)
+peakdates.14<-peakdates(date=spawn.num.14$DATE,freq=spawn.num.14$FREQ) 
+peakdates.g14<-peakdates(date=spawn.num.14$DATE,freq=spawn.num.14$FREQ14)
+
+
+par(mfrow=c(3,1))
+par(mar=c(5,4,4,4))
+
+#2012
+plot(FREQ~DATE,data=spawn.num.12[spawn.num.12$DATE<"2012-10-15",],ylim=c(0,60),axes=F, main="2012",ylab=NA,xlab=NA,
+     xlim=as.POSIXct(c("2012-08-15","2012-10-15"),format="%Y-%m-%d", tz="MST"),type="h",col="grey",
+     lwd=6,lend=2)
+
+lines(c(peakdates.12$START-12*60*60,peakdates.12$START-12*60*60),c(0,60))
+lines(c(peakdates.12$END+12*60*60,peakdates.12$END+12*60*60),c(0,60))
+
+axis(1,at=as.POSIXct(c("2012-08-15","2012-10-15"),format="%Y-%m-%d", tz="MST"),
+     lwd=20,col="white",labels=FALSE)
+
+axis.POSIXct(1,spawn.num.12$DATE,
+             at=as.POSIXct(c("2012-08-15","2012-09-01","2012-09-15","2012-10-01","2012-10-15"),format="%Y-%m-%d", tz="MST"),format="%b %d",pos=0)
+
+axis(2,las=1,lwd=0,lwd.ticks=1)
+mtext(side = 2, line = 3, "Frequency per Fish")
+par(new = T)
+plot(TEMP~DATE, type="l", axes=F,lwd=2,
+     xlim=as.POSIXct(c("2012-08-15","2012-10-15")),
+     ylim=c(0,20),
+     xlab=NA, ylab=NA, 
+     col="blue",
+     data=dailytemp[dailytemp$DATE >= "2012-08-15" & dailytemp$DATE <= "2012-10-15",])
+
+axis(side = 4, col="blue",col.axis="blue",lwd=0,lwd.ticks=1)
+mtext(side = 4, line = 3, expression("Temperature (" * degree * C *")"),col="blue")
+#axis(3,at=date(c("2012-08-15","2012-10-15")),pos=20,labels=FALSE,col.ticks="white")
+
+#2013 group 2013
+
+plot(FREQ~DATE,data=spawn.num.13[spawn.num.13$DATE<"2013-10-15",],ylim=c(0,30),axes=F, main="2013",ylab=NA,xlab=NA,
+     xlim=as.POSIXct(c("2013-08-15","2013-10-15"),format="%Y-%m-%d", tz="MST"),type="h",col="grey",
+     lwd=6,lend=2)
+
+lines(c(peakdates.g13$START-12*60*60,peakdates.g13$START-12*60*60),c(0,30))
+lines(c(peakdates.g13$END+12*60*60,peakdates.g13$END+12*60*60),c(0,30))
+
+axis(1,at=as.POSIXct(c("2013-08-15","2013-10-15"),format="%Y-%m-%d", tz="MST"),
+     lwd=20,col="white",labels=FALSE)
+
+axis.POSIXct(1,spawn.num.13$DATE,
+             at=as.POSIXct(c("2013-08-15","2013-09-01","2013-09-15","2013-10-01","2013-10-15"),format="%Y-%m-%d", tz="MST"),format="%b %d",pos=0)
+
+axis(2,las=1,lwd=0,lwd.ticks=1)
+mtext(side = 2, line = 3, "Frequency per Fish")
+par(new = T)
+plot(TEMP~DATE, type="l", axes=F,lwd=2,
+     xlim=as.POSIXct(c("2013-08-15","2013-10-15")),
+     ylim=c(0,20),
+     xlab=NA, ylab=NA, 
+     col="blue",
+     data=dailytemp[dailytemp$DATE >= "2013-08-15" & 
+                                        dailytemp$DATE <= "2013-10-15",])
+axis(side = 4, col="blue",col.axis="blue",lwd=0,lwd.ticks=1)
+mtext(side = 4, line = 3, expression("Temperature (" * degree * C *")"),col="blue")
+#axis(3,at=date(c("2012-08-15","2012-10-15")),pos=20,labels=FALSE,col.ticks="white")
+
+
+
+
+
+
+#2014 group 2014
+
+plot(FREQ~DATE,data=spawn.num.14,ylim=c(0,10),axes=F, main="2014",ylab=NA,xlab=NA,
+     xlim=as.POSIXct(c("2014-08-15","2014-10-15"),format="%Y-%m-%d", tz="MST"),type="h",col="grey",
+     lwd=6,lend=2)
+
+lines(c(peakdates.g14$START-12*60*60,peakdates.g14$START-12*60*60),c(0,10))
+lines(c(peakdates.g14$END+12*60*60,peakdates.g14$END+12*60*60),c(0,10))
+
+axis(1,at=as.POSIXct(c("2014-08-15","2014-10-15"),format="%Y-%m-%d", tz="MST"),
+     lwd=20,col="white",labels=FALSE)
+
+axis.POSIXct(1,spawn.num.13$DATE,
+             at=as.POSIXct(c("2014-08-15","2014-09-01","2014-09-15","2014-10-01","2014-10-15"),format="%Y-%m-%d", tz="MST"),format="%b %d",pos=0)
+
+axis(2,las=1,lwd=0,lwd.ticks=1)
+mtext(side = 2, line = 3, "Frequency per Fish")
+par(new = T)
+plot(TEMP~DATE, type="l", axes=F,lwd=2,
+     xlim=as.POSIXct(c("2014-08-15","2014-10-15"),format="%Y-%m-%d", tz="MST"),
+     ylim=c(0,20),
+     xlab=NA, ylab=NA, 
+     col="blue",
+     data=dailytemp[dailytemp$DATE >= "2014-08-15" & 
+                                        dailytemp$DATE <= "2014-10-15",])
+axis(side = 4, col="blue",col.axis="blue",lwd=0,lwd.ticks=1)
+mtext(side = 4, line = 3, expression("Temperature (" * degree * C *")"),col="blue")
+#axis(3,at=date(c("2012-08-15","2012-10-15")),pos=20,labels=FALSE,col.ticks="white")
+
+
+
+par(mfrow=c(1,1))
+
+
+```
+\newpage
+
+
+
+
+
+```{r, echo=FALSE,fig.height=11, fig.width=8.5}
+
+data<-table(ltspawnclust$YEAR,ltspawnclust$SITE)
+data<-data[,order(colSums(data))]
+colnames(data)<-c(dim(data)[2]:1)
+#data[data==0]<-NA
+df.bar<-barplot(data,
+                space=1,
+        axes=FALSE,
+        xlim=c(0,100),
+        #ylim=c(0,111),
+        xlab="Total Spawning Clusters Formed",
+        ylab="Spawning Sites",
+        axisnames=FALSE,
+        horiz=TRUE,
+        col=c(alpha("#FFEF00", 1),alpha("#AEC6CF", 1),alpha("#FF6961", 1)),
+        border=NA,
+        legend.text=TRUE,
+        args.legend=list( y=240, 
+                          x=65, 
+                          bty = "n",
+                          xpd=TRUE,
+                          horiz=TRUE,
+                          border="white")
+        )
+axis(1)
+
+sitesums<-cumsum(colSums(data)/sum(colSums(data)))
+s50<-length(sitesums[sitesums<=0.50])
+s95<-length(sitesums[sitesums<=0.05])
+#50% line
+lines(y=c((df.bar[s50]+df.bar[s50-1])/2,(df.bar[s50]+df.bar[s50-1])/2),
+      x=c(0,45),lwd=2)
+lines(y=c((df.bar[s50]+df.bar[s50-1])/2,(df.bar[s50]+df.bar[s50-1])/2),
+      x=c(55,100),lwd=2)
+#abline(h=(df.bar[s95]+df.bar[s95+1])/2)
+#95% line
+lines(y=c((df.bar[s95]+df.bar[s95-1])/2,(df.bar[s95]+df.bar[s95-1])/2),
+      x=c(0,45),lwd=2)
+lines(y=c((df.bar[s95]+df.bar[s95-1])/2,(df.bar[s95]+df.bar[s95-1])/2),
+      x=c(55,100),lwd=2)
+axis(2,
+     at=c(df.bar[1],df.bar[s95],
+          df.bar[s50],df.bar[length(sitesums)]),
+     labels=c(111,80,
+              17,1), 
+     lwd=0,lwd.ticks=1,las=1)
+text(x=50,y=(df.bar[s50]+df.bar[s50-1])/2,"50 %")
+text(x=50,y=(df.bar[s95]+df.bar[s95-1])/2,"95 %")
+
+```
+\newpage
+```{r,echo=FALSE,message=FALSE,warning=FALSE,fig.height=9.5 ,fig.width=8}
+
+
+library(mapplots)
+library(maptools)
+library(scales)
+
+
+data<-first.clust
+xyz<-make.xyz(x=data$CLUST.X,y=data$CLUST.Y,z=data$FREQ,group=data$YEAR)
+
+#determine max frequency
+max.all<-max(first.clust$FREQ)
+
+#2012
+data<-filter(first.clust,YEAR==2012)
+#determine scaling factor
+s=max(data$FREQ)/max.all
+
+plot(shore_outline, main=data$YEAR[1], col="grey90",border="grey70")
+
+draw.bubble(z=data$FREQ, x=data$CLUST.X, y=data$CLUST.Y, 
+         maxradius=200*s, col=alpha("lightblue", 0.3),pch=19)
+draw.bubble(z=data$FREQ, x=data$CLUST.X, y=data$CLUST.Y, 
+            maxradius=200*s, col=alpha("blue",0.3))
+
+
+legend.bubble(650800,6954000, z=max.all, round=1, n=3, maxradius=200, bty="n",pch=19,
+              col=alpha("lightblue",0.3), txt.cex = 0.7, txt.col="transparent")
+legend.bubble(650800,6954000, z=max.all, round=0, n=3, maxradius=200, bty="n",
+              col=alpha("blue",0.3),txt.cex = 0.7, txt.col = alpha("blue",0.3))
+```
+\newpage
+```{r, echo=FALSE,message=FALSE,warning=FALSE, fig.height=9.5 ,fig.width=8}
+
+
+#2013
+data<-filter(first.clust,YEAR==2013)
+#determine scaling factor
+s=max(data$FREQ)/max.all
+plot(shore_outline, main=data$YEAR[1], col="grey90",border="grey70")
+
+draw.bubble(z=data$FREQ, x=data$CLUST.X, y=data$CLUST.Y, 
+            maxradius=200*s, col=alpha("lightblue", 0.3),pch=19)
+draw.bubble(z=data$FREQ, x=data$CLUST.X, y=data$CLUST.Y, 
+            maxradius=200*s, col=alpha("blue",0.3))
+
+
+legend.bubble(650800,6954000, z=max.all, round=1, n=3, maxradius=200, bty="n",pch=19,
+              col=alpha("lightblue",0.3), txt.cex = 0.7, txt.col="transparent")
+legend.bubble(650800,6954000, z=max.all, round=0, n=3, maxradius=200, bty="n",
+              col=alpha("blue",0.3),txt.cex = 0.7, txt.col = alpha("blue",0.3))
+
+```
+\newpage
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.height=9.5 ,fig.width=8}
+#2014
+data<-filter(first.clust,YEAR==2014)
+#determine scaling factor
+s=max(data$FREQ)/max.all
+
+plot(shore_outline, main=data$YEAR[1], col="grey90",border="grey70")
+
+draw.bubble(z=data$FREQ, x=data$CLUST.X, y=data$CLUST.Y, 
+            maxradius=200*s, col=alpha("lightblue", 0.3),pch=19)
+draw.bubble(z=data$FREQ, x=data$CLUST.X, y=data$CLUST.Y, 
+            maxradius=200*s, col=alpha("blue",0.3))
+
+
+legend.bubble(650800,6954000, z=max.all, round=1, n=3, maxradius=200, bty="n",pch=19,
+              col=alpha("lightblue",0.3), txt.cex = 0.7, txt.col="transparent")
+legend.bubble(650800,6954000, z=max.all, round=0, n=3, maxradius=200, bty="n",
+              col=alpha("blue",0.3),txt.cex = 0.7, txt.col = alpha("blue",0.3))
+```
+\newpage
+
+```{r figure_10_stats, echo=FALSE, message=FALSE }
+
+require(lubridate)
+ltspawnclust3<-filter(ltspawnclust,GROUP=="GROUP2013")
+ltspawnclust3$HOURPLOT<-hour(ltspawnclust3$STARTTIME)
+ltspawnclust3$HOURPLOT[ltspawnclust3$HOURPLOT==0]<-ltspawnclust3$HOURPLOT[ltspawnclust3$HOURPLOT==0]+24
+
+
+ltspawnclust3$DATE<-as.POSIXct(ltspawnclust3$DATE,tz="MST")
+ltspawnclust3$TIME<-NA
+for(i in 1:dim(ltspawnclust3)[1]){
+  times<-suntimes[suntimes$DATE==ltspawnclust3$DATE[i],]
+  ltspawnclust3$TIME[i]<-ifelse(ltspawnclust3$HOUR[i] > times$SUNSET | ltspawnclust3$HOUR[i] < times$SUNRISE, "NIGHT","DAY")
+}
+
+require(psych)
+timemean<-circadian.mean(ltspawnclust3$HOUR)
+minutemean<-floor((timemean-floor(timemean))*60)
+timemean<-paste(floor(timemean),":",minutemean,sep="")
+timesd<-circadian.sd(ltspawnclust3$HOUR)$sd
+
+timemean_s<-circadian.mean(ltspawnclust3$HOUR[ltspawnclust3$SPAWN==1])
+minutemean<-floor((timemean_s-floor(timemean_s))*60)
+timemean_s<-paste(floor(timemean_s),":",minutemean,sep="")
+timesd_s<-circadian.sd(ltspawnclust3$HOUR[ltspawnclust3$SPAWN==1])$sd
+
+
+#y <- sqrt(table(factor(ltspawnclust3[ltspawnclust3$SPAWN==1,"HOURPLOT"], levels=0:23)))
+#y <- table(factor(ltspawnclust3$HOURPLOT, levels=0:23))
+y <- table(factor(ltspawnclust3$HOURPLOT, levels=1:24))
+y<-as.data.frame(y)
+y$Var1<-as.numeric(y$Var1)
+
+maxtime_all<-y$Var1[y$Freq==max(y$Freq)]
+maxtime_all<-paste(maxtime_all,":00--",maxtime_all+1,":00",sep="")
+maxfreq_all<-max(y$Freq)
+
+mintime_all<-y$Var1[y$Freq==min(y$Freq)]
+mintime_all<-paste(mintime_all,":00--",mintime_all+1,":00",sep="")
+minfreq_all<-min(y$Freq)
+
+#y$Var1<-as.numeric(y$Var1)+1
+y.smooth<-loess(Freq~Var1,data=y)
+
+y.smooth<-predict(y.smooth, se=T)
+
+y <- table(factor(ltspawnclust3$HOURPLOT[ltspawnclust3$SPAWN==1],levels=1:24))
+y<-as.data.frame(y)
+y$Var1<-as.numeric(y$Var1)
+
+maxtime_s<-y$Var1[y$Freq==max(y$Freq)]
+maxtime_s<-paste(maxtime_s,":00--",maxtime_s+1,":00",sep="")
+maxfreq_s<-max(y$Freq)
+
+mintime_s<-y$Var1[y$Freq==min(y$Freq)]
+mintime_s<-paste(mintime_s,":00--",mintime_s+1,":00",sep="")
+minfreq_s<-min(y$Freq)
+
+#y$Var1<-as.numeric(y$Var1)+1
+y.smooth2<-loess(Freq~Var1,data=y)
+
+y.smooth2<-predict(y.smooth2, se=T)
+
+spawntime_all<-table(ltspawnclust3$TIME)/dim(ltspawnclust3)[1]*100
+spawntime_s<-table(ltspawnclust3$TIME[ltspawnclust3$SPAWN==1])/dim(ltspawnclust3[ltspawnclust3$SPAWN==1,])[1]*100
+a<-chisq.test(table(ltspawnclust3$TIME[ltspawnclust3$SPAWN==1]))
+
+```
+
+  Lake trout showed a significant preference for spawning during the night; `r round(spawntime_s[2])`% of high activity spawning clusters occured at night (Pearson's Chi-squared Test: *X^2^* = `r round(a$statistic,digits=2)`; *p* = `r round(a$p.value,digits=3)`). However, when considering all spawning clusters (both high and low activity clusters), lake trout did not show a significant preference for night spawning (Fig. 3.10). Mean cluster formation occurred at `r timemean` &plusmn; `r round(timesd,digits=1)` h (mean &plusmn; SD), and high activity spawning clusters occurred at `r timemean_s` &plusmn; `r round(timesd_s,digits=1)` h. The maximum number of spawning clusters (*n* = `r maxfreq_all`) occurred between `r maxtime_all`, similar to the greatest number of high activity spawning clusters (*n* = `r maxfreq_s`), which also occured between `r maxtime_s`. The minimum number of spawning clusters (*n* = `r minfreq_all`) occurred between morning hours of `r mintime_all`, and no high activity spawning occurred between the hours of `r mintime_s`. 
+
+```{r figure_10 ,echo=FALSE, message=FALSE,fig.width=8,fig.height=7,fig.cap="**Fig. 10:** Lake trout spawning cluster formation start times over the duration of the 2013 spawning season (left panel), and summarized as total counts per hour (right panel), in Alexie Lake, NWT. Both low activity (open circles) and high activity (closed circles) are displayed in both panels. Light grey polygons represent dawn and dusk, dark grey polygons represent night time and vertical black lines represent the onset and conclusion of peak spawning. The lines in the right panel represent a LOESS trendline with 95% confidence interval error bars."}
+#quartz()
+layout(matrix(c(1,1,1,2,1,1,1,2),2,4,byrow=TRUE))
+par(mar=c(5.1,4.1,4.1,0),
+    oma=c(2,2,0,0))
+
+plot(HOURPLOT~STARTTIME, data=ltspawnclust3, col=rgb(0,0,0,0),pch=19, xlab="Date",ylab="Hour", xlim=c(min(dateseq),max(dateseq)),ylim=c(0.5,24.5), axes=FALSE,xaxs="i",yaxs="i")
+
+
+
+axis.POSIXct(1,at=c(dateseq[1],dateseq[18],dateseq[32],dateseq[48],dateseq[62],dateseq[79]),format="%b-%d",pos=0.5)
+
+
+axis(2,at=seq(0,24,by=4),
+     las=1)
+
+#sunrise
+polygon(c(suntimes$DATE,rev(suntimes$DATE)),c(suntimes$SUNRISE,rep(0.5,dim(suntimes)[1])), density = -1, col = "grey",border="grey")
+#dawn
+polygon(c(suntimes$DATE,rev(suntimes$DATE)),c(suntimes$DAWN,rep(0.5,dim(suntimes)[1])), density = -1, col = "darkgrey", border = "darkgrey")
+
+
+#sunset
+polygon(c(suntimes$DATE,rev(suntimes$DATE)),c(suntimes$SUNSET,rep(24.5,dim(suntimes)[1])), density = -1, col = "grey",border="grey")
+#dusk
+polygon(c(suntimes$DATE,rev(suntimes$DATE)),c(suntimes$DUSK,rep(24.5,dim(suntimes)[1])), density = -1, col = "darkgrey", border = "darkgrey")
+
+points(HOURPLOT~STARTTIME, data=ltspawnclust3,col=rgb(1,0,0,1))
+#points(HOUR~STARTTIME, data=ltspawnclust3[ltspawnclust3$SPAWN==0,], pch=19, col=rgb(0,0,1,1))
+points(HOURPLOT~STARTTIME, data=ltspawnclust3[ltspawnclust3$SPAWN==1,],pch=19,col=rgb(1,0,0,1))
+
+#lines(c(peakstart-12*60*60,peakstart-12*60*60),c(0.5,24.5))
+#lines(c(peakend+12*60*60,peakend+12*60*60),c(0.5,24.5))
+lines(c(peakdates.g13$START-12*60*60,peakdates.g13$START-12*60*60),c(0.5,24.5))
+lines(c(peakdates.g13$END+12*60*60,peakdates.g13$END+12*60*60),c(0.5,24.5))
+
+
+box(lwd=2)
+
+
+par(mar=c(5.1,0,4.1,1))
+
+
+plot(y.smooth$fit,y$Var1,pch=19,ylim=c(0.5,24.5), xlim=c(0,16), xlab="", ylab="",type="n",axes=FALSE,xaxs="i",yaxs="i")
+axis(1,at=c(0,16),labels=FALSE,lwd.ticks=0,pos=0.5,lwd=2)
+axis(2,at=c(0.5,24.5),labels=FALSE,lwd.ticks=0,pos=0,lwd=2)
+axis(3,at=seq(0,16,4), pos=24.5,lwd=2)
+axis(4,at=c(0.5,24.5),labels=FALSE,lwd.ticks=0,pos=16,lwd=2)
+mtext("Count",side=3,line=3,cex=0.6)
+
+
+arrows(x0=y.smooth$fit+ qt(0.975,y.smooth$df)*y.smooth$se,
+       y0=y$Var1,
+       x1=y.smooth$fit- qt(0.975,y.smooth$df)*y.smooth$se, 
+       angle=90,code=3,length=0.05)
+
+
+arrows(x0=y.smooth2$fit+ qt(0.975,y.smooth2$df)*y.smooth2$se,
+       y0=y$Var1,
+       x1=y.smooth2$fit- qt(0.975,y.smooth2$df)*y.smooth2$se, 
+       angle=90,code=3,length=0.05)
+
+points( y.smooth$fit,y$Var1,pch=19, col="white")
+lines( y.smooth$fit,y$Var1,type="b",lwd=2, col="red")
+lines( y.smooth2$fit,y$Var1,type="b",lwd=2, pch=19,col="red")
+
+
+```
+```{r table1_stats, echo=FALSE,warning=FALSE,message=FALSE}
+#format scientific notation
+knitr::knit_hooks$set(inline = function(x) {
+  knitr:::format_sci(x, 'md')
+})
+
+#format scientific notation
+
+require(lubridate)
+#select only males or females
+data<-new.daily[new.daily$MONTH==9 & (new.daily$SEX=="M" | new.daily$SEX=="F") & new.daily$TRANSMITTER!="LT-32",]
+
+#data<-daily[daily$MONTH==9 & (daily$SEX=="M" | daily$SEX=="F") & daily$TRANSMITTER!="LT-32",]
+data$DAY<-day(as.Date(data$DATE))
+data$YEAR<-as.factor(data$YEAR)
+data$YEAR<-droplevels(data$YEAR)
+data$TRANSMITTER<-as.factor(data$TRANSMITTER)
+data$SEX<-as.factor(data$SEX)
+data$SEX<-droplevels(data$SEX)
+#centre days
+data$cDAY<-data$DAY-mean(data$DAY)
+
+
+
+############################
+
+#daily displacement
+
+require(nlme)
+require(MuMIn)
+require(lattice)
+require(car)
+library(effects)
+library(stargazer)
+require(lsmeans)
+
+```
+
+```{r steplength model, echo=FALSE, warning=FALSE, message=FALSE}
+#test if random effect better than linear regression
+#linear model
+gls1<-gls(sqrt(STEPLENGTH)~SEX+DAY+I(DAY^2)+YEAR,data=data)
+#mixed effects model
+mod1<-lme(sqrt(STEPLENGTH)~SEX+DAY+I(DAY^2)+YEAR, random=~1|TRANSMITTER,data=data, method="REML")
+
+#check variance inflation factor
+#vif(mod1)
+#centre days
+data$cDAY<-data$DAY-mean(data$DAY)
+
+#linear model
+gls1<-gls(sqrt(STEPLENGTH)~SEX+cDAY+I(cDAY^2)+YEAR,data=data)
+#mixed effects model
+mod1<-lme(sqrt(STEPLENGTH)~SEX+cDAY+I(cDAY^2)+YEAR, random=~1|TRANSMITTER,data=data, method="REML")
+#re-check variance inflation factor
+#vif(mod1)
+
+#test is random effects improves model
+#anova(gls1,mod1)#random effect better model,
+
+#acf(residuals(mod1, type="normalized"))#looks like correlation
+
+#add AR1 correlation structure to model
+mod2<-lme(sqrt(STEPLENGTH)~SEX+cDAY+I(cDAY^2)+YEAR, random=~1|TRANSMITTER, correlation=corAR1(form=~1|TRANSMITTER) ,data=data, method="REML")
+
+
+#the AR1 model is a better fit then the model without the correlation structure
+#anova(mod1,mod2)
+
+#re-check autocorrelation
+#acf(residuals(mod2, type="normalized"))#looks pretty good
+
+
+
+#re-run model 2 with maximum likelihood (ML)
+mod2<-lme(sqrt(STEPLENGTH)~SEX+cDAY+I(cDAY^2)+YEAR, random=~1|TRANSMITTER, correlation=corAR1(form=~1|TRANSMITTER) ,data=data, method="ML")
+
+#summary(mod2)
+
+
+#lsmeans(mod2, pairwise~SEX)
+#anova(mod2,type="marginal")
+
+
+#drop SEX
+mod2.a<-update(mod2,.~.-SEX)
+#check significance of SEX
+#anova(mod2,mod2.a)# looks to be insignificant and can be dropped from full model
+
+
+#drop DAY
+#mod2.b<-update(mod2,.~.-cDAY)
+#check significance of DAY
+#anova(mod2,mod2.b)# significant!
+
+#drop DAY^2
+#mod2.c<-update(mod2,.~.-I(cDAY^2))
+#check significance of DAY^2
+#anova(mod2,mod2.c)# significant!
+
+
+#drop YEAR
+mod2.d<-update(mod2,.~.-YEAR)
+#Check significance of YEAR
+#anova(mod2,mod2.d)# significant difference
+
+mod2.d<-update(mod2.a,.~.-YEAR)
+#Check significance of YEAR
+#anova(mod2.a,mod2.d)# insignificant difference
+
+
+
+#full model
+mod.dd<-mod2
+best.dd<-mod2.d
+
+#kable(Anova(mod.dd,type=2))
+#r.squaredGLMM(mod.dd)
+```
+
+
+```{r, persindex model, echo=FALSE, message=FALSE, warning=FALSE}
+
+#test if random effect better than linear regression
+#linear model
+gls1<-gls(PERSINDEX~SEX+cDAY+I(cDAY^2)+YEAR,data=data)
+#mixed effects model
+mod1<-lme(PERSINDEX~SEX+cDAY+I(cDAY^2)+YEAR, random=~1|TRANSMITTER,data=data, method="REML")
+
+#check variance inflation factor
+#vif(mod1)
+#anova(gls1,mod1)#random effect better model,
+#l.ratio<-anova(gls1,mod1)[[2,"L.Ratio"]] 
+#0.5*(1-pchisq(l.ratio,1))
+#check for autocorrelation
+#acf(residuals(mod1, type="normalized"))#looks like correlation
+
+#add AR1 correlation structure to model
+mod2<-lme(PERSINDEX~SEX+cDAY+I(cDAY^2)+YEAR, random=~1|TRANSMITTER, correlation=corAR1(form=~1|TRANSMITTER) ,data=data, method="REML")
+
+
+#the AR1 model is a better fit then the model without the correlation structure
+#anova(mod1,mod2)
+
+#re-check autocorrelation
+#acf(residuals(mod2, type="normalized"))#looks pretty good
+
+mod2<-lme(PERSINDEX~SEX+cDAY+I(cDAY^2)+YEAR, random=~1|TRANSMITTER, correlation=corAR1(form=~1|TRANSMITTER) ,data=data, method="ML")
+
+
+#summary(mod2)
+
+
+#drop SEX
+#mod2.a<-update(mod2,.~.-SEX)
+#check significance of SEX
+#anova(mod2,mod2.a)# significant
+
+
+#drop DAY
+#mod2.b<-update(mod2,.~.-cDAY)
+#check significance of DAY
+#anova(mod2,mod2.b)# significant!
+
+#drop DAY^2
+mod2.c<-update(mod2,.~.-I(cDAY^2))
+#check significance of DAY^2
+#anova(mod2,mod2.c)# insignificant
+
+
+#drop YEAR
+#mod2.d<-update(mod2,.~.-YEAR)
+#Check significance of YEAR
+#anova(mod2,mod2.d)# significant difference
+
+#drop YEAR
+mod2.d<-update(mod2.c,.~.-YEAR)
+#Check significance of YEAR
+#anova(mod2.c,mod2.d)# significant difference
+
+
+#best model
+
+mod.pi<-mod2
+best.pi<-mod2.d
+#r.squaredGLMM(mod.pi)
+
+
+#plot(allEffects(best.pi))
+
+#check assumptions
+#heterogeneity
+#plot(fitted(mod.pi), residuals(mod.pi, type="normalized"), xlab = "Fitted Values", ylab = "Residuals")
+#abline(h = 0, lty = 2)
+#lines(smooth.spline(fitted(mod.pi), residuals(mod.pi, type="normalized")),col="red")
+#normality
+#hist(residuals(mod.pi,type="normalized"))
+#independence
+#acf(residuals(mod.pi,type="normalized"))
+
+```
+
+```{r accel model, echo=FALSE,message=FALSE, warning=FALSE}
+
+###Acceleration
+
+#accelerometers not available in 2012
+data.ac<-data[data$YEAR!=2012,]
+data.ac$YEAR<-droplevels(data.ac$YEAR)
+#remove fish without accelerometers
+data.ac<-data.ac[!is.na(data.ac$ACCELMEAN),]
+
+#hist(data.ac$ACCELMEAN)
+#log transform for normality
+#hist(log(data.ac$ACCELMEAN))
+#boxplot(log(ACCELMEAN)~SEX,data.ac)
+
+#test if random effect better than linear regression
+#linear model
+gls1<-gls(log(ACCELMEAN)~SEX+cDAY+I(cDAY^2)+YEAR,data=data.ac)
+#mixed effects model
+mod1<-lme(log(ACCELMEAN)~SEX+cDAY+I(cDAY^2)+YEAR, random=~1|TRANSMITTER,data=data.ac, method="REML")
+
+#check variance inflation
+#vif(mod1)
+
+#anova(gls1,mod1)#random effect better model, 
+
+#check for autocorrelation
+#acf(residuals(mod1, type="normalized"))#looks like correlation
+
+#add AR1 correlation structure to model
+mod2<-lme(log(ACCELMEAN)~SEX+cDAY+I(cDAY^2)+YEAR, random=~1|TRANSMITTER, correlation=corAR1(form=~1|TRANSMITTER) ,data=data.ac, method="REML")
+
+#the AR1 model is a better fit then the model without the correlation structure
+#anova(mod1,mod2)
+
+#re-check autocorrelation
+#acf(residuals(mod2, type="normalized"))#looks pretty good
+
+mod2<-lme(log(ACCELMEAN)~SEX+cDAY+I(cDAY^2)+YEAR, random=~1|TRANSMITTER, correlation=corAR1(form=~1|TRANSMITTER) ,data=data.ac, method="ML")
+
+#mod2<-lme(log(ACCELMEAN)~SEX, random=~1|TRANSMITTER, correlation=corAR1(form=~1|TRANSMITTER) ,data=data.ac, method="ML")
+
+#test significance of intereaction
+mod2.a<-update(mod2,.~.-SEX)# drop interaction
+#anova(mod2,mod2.a)#not significant remove
+
+mod2.b<-update(mod2,.~.-cDAY)# drop interaction
+#anova(mod2,mod2.b)#not significant remove
+
+mod2.c<-update(mod2,.~.-I(cDAY^2))# drop interaction
+#anova(mod2,mod2.c)#not significant remove
+
+mod2.d<-update(mod2,.~.-YEAR)# drop interaction
+#anova(mod2,mod2.d)#not significant remove
+
+#best model
+mod2.a<-update(mod2.d,.~.-SEX)# drop interaction
+#anova(mod2.d,mod2.a)#not significant remove
+
+
+mod2.b<-update(mod2.d,.~.-cDAY)# drop interaction
+#anova(mod2.d,mod2.b)#not significant remove
+
+mod2.c<-update(mod2.d,.~.-I(cDAY^2))# drop interaction
+#anova(mod2.d,mod2.c)#not significant remove
+
+mod2.a<-update(mod2.b,.~.-SEX)# drop interaction
+#anova(mod2.b,mod2.a)#not significant remove
+
+mod2.c<-update(mod2.b,.~.-I(cDAY^2))# drop interaction
+#anova(mod2.b,mod2.c)#not significant remove
+
+
+
+
+mod.ac<-mod2
+best.ac<-mod2.b
+#mod.ac<-update(mod.ac,.~.-YEAR)
+
+#r.squaredGLMM(mod.ac)
+#kable(Anova(mod2.b,type=2))
+
+
+#check assumptions
+#heterogeneity
+#plot(fitted(mod.ac), residuals(mod.ac, type="normalized"), xlab = "Fitted Values", ylab = "Residuals")
+#abline(h = 0, lty = 2)
+#lines(smooth.spline(fitted(mod.ac), residuals(mod.ac, type="normalized")),col="red")
+#normality
+#hist(residuals(mod.ac,type="normalized"))
+#independence
+#acf(residuals(mod.ac,type="normalized"))
+```
+
+```{r basicmove,fig.cap=tabs("basicmove",caption="Summary statistics for spawning male, spawning female and non-spawning female lake trout movement metrics during the 2013 spawning season in Alexie Lake, NWT. I report the number of fish (n), means and standard deviations of daily distance travelled (km), persistence index (PI), and acceleration (m s^-2^).")}
+
+data<-spawntable[spawntable$MONTH==9,]
+#remove month
+data<-data[,-2]
+data<-data[!data$SEX=="U",]
+data$YEAR<-as.character(data$YEAR)
+#digits(data,2)
+
+data$ACCEL.SD[is.nan(data$ACCEL.SD)]<-"-"
+data$ACCEL.MEAN[is.nan(data$ACCEL.MEAN)]<-"-"
+colnames(data)<-c("Year","Sex","n","Daily Displacement","Std. Dev.",
+                        "Persistence Index","Std. Dev.",
+                        "Acceleration","Std. Dev.")
+
+
+kable(data, digits=2)
+```
+
+```{r, eval=FALSE, ech=FALSE}
+###Lake trout spawning behaviour
+
+ Over the course of the spawning season lake trout daily distance travelled was not significantly different between spawning males and females with both sexes moving ~ 7 km per day (tabs("basicmove",cite=TRUE). The non-spawning female did show a higher daily displace of `r round(mean(daily$STEPLENGTH[daily$TRANSMITTER=="LT-32"])/1000,digits=2)` (&plusmn;`r round(sd(daily$STEPLENGTH[daily$TRANSMITTER=="LT-32"])/1000,digits=2)`; table 1). Spawning females made more linear movements than males, as indicated by females having a significantly higher persistence index (Wilcoxon Rank Sum Test: *W* = `r pi.test$statistic`; *p* `r ifelse(pi.test$p.value<0.001,"< 0.001",paste("= ",round(pi.test$p.value,digits=3),sep=""))`; table 1). The non-spawning female also made more directed movement consisitent with spawning females but with a greater PI (`r round(mean(daily$PERSINDEX[daily$TRANSMITTER=="LT-32"]),digits=2)` &plusmn; `r round(sd(daily$PERSINDEX[daily$TRANSMITTER=="LT-32"]),digits=2)`; table 1). Spawning males exerted significantly more energy than females over the course of the spawning season in spite of similar daily displacements, exhibiting daily acceleration rates `r round(spawntable$ACCEL[1]-spawntable$ACCEL[2],digits=2)` m s^-2^ greater than females (*W*= `r accel.test$statistic`; *p* `r ifelse(accel.test$p.value<0.001,"< 0.001",paste("= ",round(accel.test$p.value,digits=3),sep=""))`; table 3.1). The non-spawning female also showed similer acceleration as spawning females (`r round(mean(daily$ACCEL[daily$TRANSMITTER=="LT-32"]),digits=2)` &plusmn; `r round(sd(daily$ACCEL[daily$TRANSMITTER=="LT-32"]),digits=2)`; table 1).  
+```    
+
+
 
 ##References

@@ -1,4 +1,4 @@
-
+ 
 #plots 6.15 x 4.76
 source('Functions/st-dbscan function.R')
 library(lubridate)
@@ -86,57 +86,6 @@ fish$BOTTOMDEPTH<-(extract(r,fish[c("UTM.X","UTM.Y")]))
 
 #calculate distance between bottom depth and fish depth
 fish$OFFBOTTOM<-fish$BOTTOMDEPTH-fish$DEPTH
-
-####NOT RUN
-#####determine when 15 deg is less than 4m
-
-#create temp and oxygen data frames
-temp<-read.csv("~/Documents/Masters Thesis/Data/Temp/Alexie mean daily temp 2013.csv")
-source('~/Documents/R-Directory/Masters Thesis/R-Functions/Functions/tempDepth.R')
-require(reshape2)
-temp<-melt(temp,id.var = "Depth..m.")
-
-colnames(temp)<-c("Depth","Date","Temp")
-
-#assign Date as date class (chron package)
-temp$Date<-as.character(temp$Date)
-temp$Date<-substr(temp$Date,2,11)
-temp$Date<-gsub(".","/",temp$Date, fixed=TRUE)
-temp$Date<-as.POSIXct(temp$Date, format = "%d / %m / %Y", tz="MST")
-
-#remove NA's
-temp<-temp[!is.na(temp$Date),]
-
-
-
-temp2<-read.csv("~/Documents/Masters Thesis/Data/Temp/alexie_sept2013-may2014_temp.csv")
-
-temp2$Date<-as.POSIXct(temp2$Date, format="%d / %m / %Y", tz="MST")
-temp2<-temp2[,c("Depth","Date","Temp")]
-
-temp<-rbind(temp,temp2)
-
-save(temp,file="temp.RData")
-
-depth15<-tempDepth(15,data=temp)
-
-depth15$Depth[depth15$Depth==-1]<-0
-#extend depth15 to october 15
-
-#dates<-seq.POSIXt(from=as.POSIXct("2013-09-28",tz="MST"),
- #          to=as.POSIXct("2013-10-15",tz="MST"),
-  #         by="day")
-#tempext<-data.frame(Depth=rep(0,length(dates)),
- #                   Date=dates)
-#depth15<-rbind(depth15,tempext)
-
-
-depth15[depth15$Depth<=4,]
-
-#spring defined as days before 15deg C thermocline falls deeper than 4m
-#spawn is when  15deg C thermocline rises greater than 4m
-
-######End of NOT RUN
 
 #Extract fish positions during spawn ~ September 
 fishspawn<-fish[fish$DATETIME>=as.POSIXct("2012-09-01",tz="MST") & 
@@ -1063,9 +1012,38 @@ for(i in 1:length(mcp2012)){
 
 
 
+#surface temp
+dailytemp<-read.csv("~/Data/alexiedailysurfacetemp.csv")
+dailytemp<-dailytemp[,-1]
+dailytemp<-dailytemp[,-2]
+names(dailytemp)<-c("DATE","TEMP","SD")
+
+#15C isocline
+temperature<-read.csv("~/Data/All_temp_logger_data.csv")
+dim(temperature[temperature$LOCATION_ID==1,])
+temp<-temperature[,c(3,5,6)]
+names(temp)<-c("DATETIME","DEPTH","TEMP")
+temp$DATETIME<-ymd_hms(temp$DATETIME,tz="MST")
+temp$DATE<-date(temp$DATETIME)
+temp<-temp[,-1]
+
+daily_temp <- temp %>%
+  group_by(DATE,DEPTH) %>%
+  summarise_each(funs(mean,sd))
+
+names(daily_temp)<-c("DATE","DEPTH","TEMP","SD")
+
+depth15<-tempDepth(temp=15,
+                   datedata=daily_temp$DATE,
+                   depthdata=daily_temp$DEPTH,
+                   tempdata=daily_temp$TEMP)
+
+
+depth15$Depth[depth15$Depth==-1]<-0
 
 
 
-save(ltspawnclust,first.clust,spawn.num,cluster,shore_outline,
-     daily, spawntable, spawn, mcpclust, all_mcp,mcpoverlap, file="SpawnClust.RData")
-
+save(ltspawnclust,dailytemp,first.clust,spawn.num,cluster,shore_outline,
+     daily, spawntable, spawn, mcpclust, all_mcp,mcpoverlap,depth15, file="SpawnClust.RData")
+save(fishspawn,file="~/Data/fishspawn.RData")
+save(fishbind_all,file="~/Data/fish.RData")

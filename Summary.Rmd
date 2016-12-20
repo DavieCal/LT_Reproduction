@@ -210,7 +210,8 @@ data$DAY<-day(as.Date(data$DATE))
 data$YEAR<-as.factor(data$YEAR)
 data$TRANSMITTER<-as.factor(data$TRANSMITTER)
 data$SEX<-as.factor(data$SEX)
-
+#centre days
+data$cDAY<-data$DAY-mean(data$DAY)
 
 
 ############################
@@ -221,10 +222,11 @@ require(nlme)
 require(MuMIn)
 require(lattice)
 require(car)
+require(lsmeans)
 library(effects)
 ```
 ```{r}
-xyplot(sqrt(STEPLENGTH) ~ DAY|TRANSMITTER, groups=YEAR, type=c("p","smooth"), data=data)
+xyplot(sqrt(STEPLENGTH) ~ DAY|TRANSMITTER, groups=SEX, type=c("p","smooth"), data=data)
 
 ```
 ```{r}
