@@ -1,14 +1,14 @@
 ---
 csl: canadian-journal-of-fisheries-and-aquatic-sciences.csl
 output:
-  html_document:
-    fig_caption: yes
-  pdf_document:
-    fig_caption: yes
   word_document:
     fig_caption: yes
     pandoc_args: --smart
     reference_docx: format.docx
+  pdf_document:
+    fig_caption: yes
+  html_document:
+    fig_caption: yes
 ---
 
 Title: Lake trout (*Savelinus namaycush*) reproductive behaviour in a northern lake
@@ -158,9 +158,9 @@ mtext("Depth (m)", side=2, line=3, adj=1.2)
 
 
 ```
-\newpage
 
-```{r}
+
+```{r, eval=FALSE, echo=FALSE, message-FALSE, warning=FALSE}
 library(MASS)
 df<-fish[fish$DATETIME>="2013-08-15" & fish$DATETIME<="2013-10-15",c("SEX","DEPTH","DATETIME")]
 df<-df[!is.na(df$DEPTH),]
@@ -243,8 +243,8 @@ mtext("Depth (m)", side=2, line=3, adj=1.2)
 
 
 ```
-\newpage
-```{r  figure_3, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="**Fig. 3:** Kernel density estimate of bottom contour depth occupied by male (blue) and female (red) lake trout in Alexie Lake, NWT, between August 30 and September 30, 2013."}
+
+```{r  bottomcontour, echo=FALSE, message=FALSE, warning=FALSE, fig.cap=figs("bottomcontour",caption= "Kernel density estimate of bottom contour depth occupied by male (blue) and female (red) lake trout in Alexie Lake, NWT, between August 30 and September 30, 2013.")}
 
 #Depth Contour
 data<-filter(fishspawn,YEAR=="2013")
@@ -291,12 +291,12 @@ legend("topright",c('Male', "Female"),
 
 #abline(v=4)
 ```
-\newpage
+
 
 The spatial distribution of lake trout in Alexie Lake differed between sexes during the 2013 spawning season. Males had a higher density of detections in the nearshore region than females (Fig. 4). Males exhibited a clear peaked mode at a mean distance from shore of `r round(peaks_dist_M)[1]` m, and a second distinct mode at a mean distance from shore of `r round(peaks_dist_M)[3]` m (Fig. 4). Female lake trout exhibited three major modes at mean distances from shore of `r round(peaks_dist_F)[1]` m, `r round(peaks_dist_F)[2]` m, and `r round(peaks_dist_F)[3]` m, but none showed the same high density as males (Fig. 4). 
   
 
-```{r figure_4,echo=FALSE, message=FALSE, fig.cap="**Fig. 4:** Kernel density estimate (KDE) of  distance to nearest shore occupied by male (blue) and female (red) lake trout in Alexie Lake, NWT, between August 30 and September 30, 2013."}
+```{r shoredist,echo=FALSE, message=FALSE, fig.cap=figs("shoredist",caption="Kernel density estimate (KDE) of  distance to nearest shore occupied by male (blue) and female (red) lake trout in Alexie Lake, NWT, between August 30 and September 30, 2013.")}
 
 data<-filter(fishspawn,YEAR=="2013")
 #Nearshore
@@ -337,7 +337,65 @@ legend("topright",c('Male', "Female"),
        fill = c(MaleCol,FemaleCol), bty = 'n',
        border = NA)
 ```
-```{r spawn_time, echo=FALSE, message=FALSE, warning=FALSE ,fig.height=9, fig.width= 8.5}
+
+```{r sitebar, echo=FALSE,fig.height=11, fig.width=8.5, fig.cap=figs("sitebar")}
+data<-ltspawnclust %>%
+  filter(MONTH==9)
+data<-table(data$YEAR,data$SITE)
+data<-data[,order(colSums(data))]
+colnames(data)<-c(dim(data)[2]:1)
+#data[data==0]<-NA
+df.bar<-barplot(data,
+                space=1,
+        axes=FALSE,
+        xlim=c(0,100),
+        #ylim=c(0,111),
+        xlab="Total Spawning Clusters Formed",
+        ylab="Spawning Sites",
+        axisnames=FALSE,
+        horiz=TRUE,
+        col=c(alpha("#FFEF00", 1),alpha("#AEC6CF", 1),alpha("#FF6961", 1)),
+        border=NA,
+        legend.text=TRUE,
+        args.legend=list( y=220, 
+                          x=65, 
+                          bty = "n",
+                          xpd=TRUE,
+                          horiz=TRUE,
+                          border="white")
+        )
+axis(1)
+
+l100=dim(data)[2]
+sitesums<-cumsum(colSums(data)/sum(colSums(data)))
+s50<-length(sitesums[sitesums<=0.50])
+l50<-l100-s50
+s95<-length(sitesums[sitesums<=0.05])
+l95<-l100-s95
+#50% line
+lines(y=c((df.bar[s50]+df.bar[s50-1])/2,(df.bar[s50]+df.bar[s50-1])/2),
+      x=c(0,45),lwd=2)
+lines(y=c((df.bar[s50]+df.bar[s50-1])/2,(df.bar[s50]+df.bar[s50-1])/2),
+      x=c(55,100),lwd=2)
+#abline(h=(df.bar[s95]+df.bar[s95+1])/2)
+#95% line
+lines(y=c((df.bar[s95]+df.bar[s95-1])/2,(df.bar[s95]+df.bar[s95-1])/2),
+      x=c(0,45),lwd=2)
+lines(y=c((df.bar[s95]+df.bar[s95-1])/2,(df.bar[s95]+df.bar[s95-1])/2),
+      x=c(55,100),lwd=2)
+axis(2,
+     at=c(df.bar[1],df.bar[s95],
+          df.bar[s50],df.bar[length(sitesums)]),
+     labels=c(l100,l95,
+              l50,1), 
+     lwd=0,lwd.ticks=1,las=1)
+text(x=50,y=(df.bar[s50]+df.bar[s50-1])/2,"50 %")
+text(x=50,y=(df.bar[s95]+df.bar[s95-1])/2,"95 %")
+
+```
+
+
+```{r spawntime, echo=FALSE, message=FALSE, warning=FALSE ,fig.height=9, fig.width= 8.5, fig.cap=figs("spawntime", caption="Thinking about changing colours of different years to the same as the stacked bar chart")}
 require(scales)
 
 
@@ -398,8 +456,8 @@ plot(FREQ~DATE,data=spawn.num.13[spawn.num.13$DATE<"2013-10-15",],ylim=c(0,30),a
      xlim=as.POSIXct(c("2013-08-15","2013-10-15"),format="%Y-%m-%d", tz="MST"),type="h",col="grey",
      lwd=6,lend=2)
 
-lines(c(peakdates.g13$START-12*60*60,peakdates.g13$START-12*60*60),c(0,30))
-lines(c(peakdates.g13$END+12*60*60,peakdates.g13$END+12*60*60),c(0,30))
+lines(c(peakdates.13$START-12*60*60,peakdates.13$START-12*60*60),c(0,30))
+lines(c(peakdates.13$END+12*60*60,peakdates.13$END+12*60*60),c(0,30))
 
 axis(1,at=as.POSIXct(c("2013-08-15","2013-10-15"),format="%Y-%m-%d", tz="MST"),
      lwd=20,col="white",labels=FALSE)
@@ -432,8 +490,8 @@ plot(FREQ~DATE,data=spawn.num.14,ylim=c(0,10),axes=F, main="2014",ylab=NA,xlab=N
      xlim=as.POSIXct(c("2014-08-15","2014-10-15"),format="%Y-%m-%d", tz="MST"),type="h",col="grey",
      lwd=6,lend=2)
 
-lines(c(peakdates.g14$START-12*60*60,peakdates.g14$START-12*60*60),c(0,10))
-lines(c(peakdates.g14$END+12*60*60,peakdates.g14$END+12*60*60),c(0,10))
+lines(c(peakdates.14$START-12*60*60,peakdates.14$START-12*60*60),c(0,10))
+lines(c(peakdates.14$END+12*60*60,peakdates.14$END+12*60*60),c(0,10))
 
 axis(1,at=as.POSIXct(c("2014-08-15","2014-10-15"),format="%Y-%m-%d", tz="MST"),
      lwd=20,col="white",labels=FALSE)
@@ -461,65 +519,22 @@ par(mfrow=c(1,1))
 
 
 ```
-\newpage
 
 
+###Spatial distribution of spawning clusters
+
+Using our spatial temporal clustering algorithm, we estimated that `r length(unique(ltspawnclust$TRANSMITTER[ltspawnclust$MONTH==9]))` lake trout formed spawning clusters at `r length(unique(ltspawnclust$SITE[ltspawnclust$MONTH==9]))` unique sites during the 20120--2014 spawning seasons (~September; `r figs("sitebar", display="cite")`). Site use varied among sites with a mean of 9.1 spawning clusters and ranging from 1--92, as well as among years with 23 lake trout creating 567 spawning clusters in 2012, 18 lake trout creating 309 clusters in 2013 and 6 lake trout creating 53 clusters in 2014 (`r figs("spawntime",display="cite")`). Fifty percent of spawning clusters occured among 15 sites, and 95% occuring among 71 sites (`r figs("sitebar", display="cite")`). 
+
+Spawning sites were distributed throughout the nearshore region of Alexie Lake covering an area of `r round(all_mcp$area,digits=2)` 3km^2^ (based on MCP).
+
+maybe talk about mcp among years?
+
+maybe talk about distance between sites?
+
+maybe talk about distance between sotes among years?    
 
 
-
-```{r, echo=FALSE,fig.height=11, fig.width=8.5}
-
-data<-table(ltspawnclust$YEAR,ltspawnclust$SITE)
-data<-data[,order(colSums(data))]
-colnames(data)<-c(dim(data)[2]:1)
-#data[data==0]<-NA
-df.bar<-barplot(data,
-                space=1,
-        axes=FALSE,
-        xlim=c(0,100),
-        #ylim=c(0,111),
-        xlab="Total Spawning Clusters Formed",
-        ylab="Spawning Sites",
-        axisnames=FALSE,
-        horiz=TRUE,
-        col=c(alpha("#FFEF00", 1),alpha("#AEC6CF", 1),alpha("#FF6961", 1)),
-        border=NA,
-        legend.text=TRUE,
-        args.legend=list( y=240, 
-                          x=65, 
-                          bty = "n",
-                          xpd=TRUE,
-                          horiz=TRUE,
-                          border="white")
-        )
-axis(1)
-
-sitesums<-cumsum(colSums(data)/sum(colSums(data)))
-s50<-length(sitesums[sitesums<=0.50])
-s95<-length(sitesums[sitesums<=0.05])
-#50% line
-lines(y=c((df.bar[s50]+df.bar[s50-1])/2,(df.bar[s50]+df.bar[s50-1])/2),
-      x=c(0,45),lwd=2)
-lines(y=c((df.bar[s50]+df.bar[s50-1])/2,(df.bar[s50]+df.bar[s50-1])/2),
-      x=c(55,100),lwd=2)
-#abline(h=(df.bar[s95]+df.bar[s95+1])/2)
-#95% line
-lines(y=c((df.bar[s95]+df.bar[s95-1])/2,(df.bar[s95]+df.bar[s95-1])/2),
-      x=c(0,45),lwd=2)
-lines(y=c((df.bar[s95]+df.bar[s95-1])/2,(df.bar[s95]+df.bar[s95-1])/2),
-      x=c(55,100),lwd=2)
-axis(2,
-     at=c(df.bar[1],df.bar[s95],
-          df.bar[s50],df.bar[length(sitesums)]),
-     labels=c(111,80,
-              17,1), 
-     lwd=0,lwd.ticks=1,las=1)
-text(x=50,y=(df.bar[s50]+df.bar[s50-1])/2,"50 %")
-text(x=50,y=(df.bar[s95]+df.bar[s95-1])/2,"95 %")
-
-```
-\newpage
-```{r,echo=FALSE,message=FALSE,warning=FALSE,fig.height=9.5 ,fig.width=8}
+```{r clustbub12,echo=FALSE,message=FALSE,warning=FALSE,fig.height=9.5 ,fig.width=8, fig.cap=figs("clustbub12", caption="Thinking about changing colours of different years to the same as the stacked bar chart")}
 
 
 library(mapplots)
@@ -550,10 +565,6 @@ legend.bubble(650800,6954000, z=max.all, round=1, n=3, maxradius=200, bty="n",pc
               col=alpha("lightblue",0.3), txt.cex = 0.7, txt.col="transparent")
 legend.bubble(650800,6954000, z=max.all, round=0, n=3, maxradius=200, bty="n",
               col=alpha("blue",0.3),txt.cex = 0.7, txt.col = alpha("blue",0.3))
-```
-\newpage
-```{r, echo=FALSE,message=FALSE,warning=FALSE, fig.height=9.5 ,fig.width=8}
-
 
 #2013
 data<-filter(first.clust,YEAR==2013)
@@ -572,9 +583,7 @@ legend.bubble(650800,6954000, z=max.all, round=1, n=3, maxradius=200, bty="n",pc
 legend.bubble(650800,6954000, z=max.all, round=0, n=3, maxradius=200, bty="n",
               col=alpha("blue",0.3),txt.cex = 0.7, txt.col = alpha("blue",0.3))
 
-```
-\newpage
-```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.height=9.5 ,fig.width=8}
+
 #2014
 data<-filter(first.clust,YEAR==2014)
 #determine scaling factor
@@ -593,7 +602,20 @@ legend.bubble(650800,6954000, z=max.all, round=1, n=3, maxradius=200, bty="n",pc
 legend.bubble(650800,6954000, z=max.all, round=0, n=3, maxradius=200, bty="n",
               col=alpha("blue",0.3),txt.cex = 0.7, txt.col = alpha("blue",0.3))
 ```
-\newpage
+
+
+
+###Timing of spawning  
+
+  Peak spawning generally commenced September 10 (`r figs("spawntime", display="cite")`), lasting `r as.numeric(difftime(peakdates.12$END,peakdates.12$START,,units="days"))` days in 2012 (`r format(peakdates.12$START,"%B %e")`--`r format(peakdates.12$END,"%B %e")`); `r as.numeric(difftime(peakdates.13$END,peakdates.13$START,,units="days"))` days in 2013 (`r format(peakdates.13$START,"%B %e")`--`r format(peakdates.13$END,"%B %e")`); and `r as.numeric(difftime(peakdates.14$END,peakdates.14$START,,units="days"))` days in 2014 (`r format(peakdates.14$START,"%B %e")`--`r format(peakdates.14$END,"%B %e")`). Surface temperature at the commencement of peak spawn was similar in 2012 (`r round(dailytemp$TEMP[dailytemp$DATE==peakdates.12$START], digits=1)`&deg;C) and 2013 (`r round(dailytemp$TEMP[dailytemp$DATE==peakdates.13$START], digits=1)`&deg;C) but was lowest in 2014 (`r round(dailytemp$TEMP[dailytemp$DATE==peakdates.14$START], digits=1)`&deg;C). Similarly, the completion of peak spawn in 2012 and 2013 occured at close temperatures of `r round(dailytemp$TEMP[dailytemp$DATE==peakdates.12$END], digits=1)`&deg;C and `r round(dailytemp$TEMP[dailytemp$DATE==peakdates.13$END], digits=1)`&deg;C respectively, but several degrees lower in 2014 (`r round(dailytemp$TEMP[dailytemp$DATE==peakdates.14$END], digits=1)`&deg;C). 
+
+
+```{r eval=FALSE, echo=FALSE}
+
+ The maximum number of spawning clusters (`r max(spawn.num$FREQ)`) occured on `r format(peakdays[1],"%B %e")`. The majority of all spawning clusters (`r round(dim(spawn[spawn$DATE>=peakstart & spawn$DATE<=peakend,])[1]/dim(spawn)[1]*100)`%) and high activity spawning clusters (`r round(dim(spawn[spawn$DATE>=peakstart & spawn$DATE<=peakend & spawn$SPAWN==1,])[1]/dim(spawn[spawn$SPAWN==1,])[1]*100)`%) occurred during peak spawn. The frequency distributions of total, high activity, and low activity spawning cluster were similar (Fig. 8). Peak spawning for male and female lake trout occurred at similar dates, with peaks occurring on `r format(malepeak, "%B %e")` and `r format(femalepeak, "%B %e")`, respectively  (Fig. 9). Males collectively remained on the spawning shoals for maximum of `r as.numeric(mdays)` consecutive days while females collectively spent a maximum of `r as.numeric(fdays)` consecutive days.
+ 
+```
+
 
 ```{r figure_10_stats, echo=FALSE, message=FALSE }
 
@@ -661,12 +683,13 @@ y.smooth2<-predict(y.smooth2, se=T)
 spawntime_all<-table(ltspawnclust3$TIME)/dim(ltspawnclust3)[1]*100
 spawntime_s<-table(ltspawnclust3$TIME[ltspawnclust3$SPAWN==1])/dim(ltspawnclust3[ltspawnclust3$SPAWN==1,])[1]*100
 a<-chisq.test(table(ltspawnclust3$TIME[ltspawnclust3$SPAWN==1]))
-
+b<-chisq.test(table(ltspawnclust3$TIME[ltspawnclust3$SPAWN==0]))
+c<-chisq.test(table(ltspawnclust3$TIME))
 ```
 
-  Lake trout showed a significant preference for spawning during the night; `r round(spawntime_s[2])`% of high activity spawning clusters occured at night (Pearson's Chi-squared Test: *X^2^* = `r round(a$statistic,digits=2)`; *p* = `r round(a$p.value,digits=3)`). However, when considering all spawning clusters (both high and low activity clusters), lake trout did not show a significant preference for night spawning (Fig. 3.10). Mean cluster formation occurred at `r timemean` &plusmn; `r round(timesd,digits=1)` h (mean &plusmn; SD), and high activity spawning clusters occurred at `r timemean_s` &plusmn; `r round(timesd_s,digits=1)` h. The maximum number of spawning clusters (*n* = `r maxfreq_all`) occurred between `r maxtime_all`, similar to the greatest number of high activity spawning clusters (*n* = `r maxfreq_s`), which also occured between `r maxtime_s`. The minimum number of spawning clusters (*n* = `r minfreq_all`) occurred between morning hours of `r mintime_all`, and no high activity spawning occurred between the hours of `r mintime_s`. 
 
-```{r figure_10 ,echo=FALSE, message=FALSE,fig.width=8,fig.height=7,fig.cap="**Fig. 10:** Lake trout spawning cluster formation start times over the duration of the 2013 spawning season (left panel), and summarized as total counts per hour (right panel), in Alexie Lake, NWT. Both low activity (open circles) and high activity (closed circles) are displayed in both panels. Light grey polygons represent dawn and dusk, dark grey polygons represent night time and vertical black lines represent the onset and conclusion of peak spawning. The lines in the right panel represent a LOESS trendline with 95% confidence interval error bars."}
+
+```{r spawnday ,echo=FALSE, message=FALSE,fig.width=8,fig.height=7,fig.cap=figs("spawnday", caption=" Lake trout spawning cluster formation start times over the duration of the 2013 spawning season (left panel), and summarized as total counts per hour (right panel), in Alexie Lake, NWT. Both low activity (open circles) and high activity (closed circles) are displayed in both panels. Light grey polygons represent dawn and dusk, dark grey polygons represent night time and vertical black lines represent the onset and conclusion of peak spawning. The lines in the right panel represent a LOESS trendline with 95% confidence interval error bars.")}
 #quartz()
 layout(matrix(c(1,1,1,2,1,1,1,2),2,4,byrow=TRUE))
 par(mar=c(5.1,4.1,4.1,0),
@@ -734,6 +757,11 @@ lines( y.smooth2$fit,y$Var1,type="b",lwd=2, pch=19,col="red")
 
 
 ```
+
+
+
+  Lake trout showed a significant preference for spawning during the night in 2013; `r round(spawntime_s[2])`% of high activity spawning clusters occured at night (Pearson's Chi-squared Test: *X^2^* = `r round(a$statistic,digits=2)`; *p* = `r round(a$p.value,digits=3)`). However, when considering all spawning clusters (both high and low activity clusters), lake trout did not show a significant preference for night spawning (Fig. 3.10). Mean cluster formation occurred at `r timemean` &plusmn; `r round(timesd,digits=1)` h (mean &plusmn; SD), and high activity spawning clusters occurred at `r timemean_s` &plusmn; `r round(timesd_s,digits=1)` h. The maximum number of spawning clusters (*n* = `r maxfreq_all`) occurred between `r maxtime_all`, similar to the greatest number of high activity spawning clusters (*n* = `r maxfreq_s`), which also occured between `r maxtime_s`. The minimum number of spawning clusters (*n* = `r minfreq_all`) occurred between morning hours of `r mintime_all`, and no high activity spawning occurred between the hours of `r mintime_s`. 
+
 ```{r table1_stats, echo=FALSE,warning=FALSE,message=FALSE}
 #format scientific notation
 knitr::knit_hooks$set(inline = function(x) {
@@ -764,12 +792,14 @@ data$cDAY<-data$DAY-mean(data$DAY)
 
 require(nlme)
 require(MuMIn)
-require(lattice)
+#require(lattice)
 require(car)
 library(effects)
 library(stargazer)
 require(lsmeans)
+require(multcomp)
 
+library(boot)
 ```
 
 ```{r steplength model, echo=FALSE, warning=FALSE, message=FALSE}
@@ -791,14 +821,16 @@ mod1<-lme(sqrt(STEPLENGTH)~SEX+cDAY+I(cDAY^2)+YEAR, random=~1|TRANSMITTER,data=d
 #re-check variance inflation factor
 #vif(mod1)
 
+
 #test is random effects improves model
 #anova(gls1,mod1)#random effect better model,
 
-#acf(residuals(mod1, type="normalized"))#looks like correlation
+#acf(residuals(mod1))#looks like correlation
 
 #add AR1 correlation structure to model
-mod2<-lme(sqrt(STEPLENGTH)~SEX+cDAY+I(cDAY^2)+YEAR, random=~1|TRANSMITTER, correlation=corAR1(form=~1|TRANSMITTER) ,data=data, method="REML")
-
+mod2<-lme(sqrt(STEPLENGTH)~SEX+cDAY+I(cDAY^2)+YEAR, 
+          random=~1|TRANSMITTER, correlation=corAR1(form=~1|TRANSMITTER) ,
+          data=data,method="REML")
 
 #the AR1 model is a better fit then the model without the correlation structure
 #anova(mod1,mod2)
@@ -813,45 +845,25 @@ mod2<-lme(sqrt(STEPLENGTH)~SEX+cDAY+I(cDAY^2)+YEAR, random=~1|TRANSMITTER, corre
 
 #summary(mod2)
 
+#dredge(mod2)
 
-#lsmeans(mod2, pairwise~SEX)
-#anova(mod2,type="marginal")
+mod3<-lme(sqrt(STEPLENGTH)~cDAY+I(cDAY^2), random=~1|TRANSMITTER, correlation=corAR1(form=~1|TRANSMITTER) ,data=data, method="REML")
 
+#anova(mod3,type="marginal")
 
-#drop SEX
-mod2.a<-update(mod2,.~.-SEX)
-#check significance of SEX
-#anova(mod2,mod2.a)# looks to be insignificant and can be dropped from full model
-
-
-#drop DAY
-#mod2.b<-update(mod2,.~.-cDAY)
-#check significance of DAY
-#anova(mod2,mod2.b)# significant!
-
-#drop DAY^2
-#mod2.c<-update(mod2,.~.-I(cDAY^2))
-#check significance of DAY^2
-#anova(mod2,mod2.c)# significant!
-
-
-#drop YEAR
-mod2.d<-update(mod2,.~.-YEAR)
-#Check significance of YEAR
-#anova(mod2,mod2.d)# significant difference
-
-mod2.d<-update(mod2.a,.~.-YEAR)
-#Check significance of YEAR
-#anova(mod2.a,mod2.d)# insignificant difference
-
-
-
-#full model
 mod.dd<-mod2
-best.dd<-mod2.d
+best.dd<-mod3
 
-#kable(Anova(mod.dd,type=2))
-#r.squaredGLMM(mod.dd)
+#check assumptions
+#heterogeneity
+#plot(fitted(best.dd), residuals(best.dd, type="normalized"), xlab = "Fitted Values", ylab = "Residuals")
+#abline(h = 0, lty = 2)
+#lines(smooth.spline(fitted(best.dd), residuals(best.dd, type="normalized")),col="red")
+#normality
+#hist(residuals(best.dd,type="normalized"))
+#independence
+#acf(residuals(best.dd,type="normalized"))
+
 ```
 
 
@@ -883,42 +895,12 @@ mod2<-lme(PERSINDEX~SEX+cDAY+I(cDAY^2)+YEAR, random=~1|TRANSMITTER, correlation=
 
 mod2<-lme(PERSINDEX~SEX+cDAY+I(cDAY^2)+YEAR, random=~1|TRANSMITTER, correlation=corAR1(form=~1|TRANSMITTER) ,data=data, method="ML")
 
+#dredge(mod2)
 
-#summary(mod2)
-
-
-#drop SEX
-#mod2.a<-update(mod2,.~.-SEX)
-#check significance of SEX
-#anova(mod2,mod2.a)# significant
-
-
-#drop DAY
-#mod2.b<-update(mod2,.~.-cDAY)
-#check significance of DAY
-#anova(mod2,mod2.b)# significant!
-
-#drop DAY^2
-mod2.c<-update(mod2,.~.-I(cDAY^2))
-#check significance of DAY^2
-#anova(mod2,mod2.c)# insignificant
-
-
-#drop YEAR
-#mod2.d<-update(mod2,.~.-YEAR)
-#Check significance of YEAR
-#anova(mod2,mod2.d)# significant difference
-
-#drop YEAR
-mod2.d<-update(mod2.c,.~.-YEAR)
-#Check significance of YEAR
-#anova(mod2.c,mod2.d)# significant difference
-
-
-#best model
+mod3<-lme(PERSINDEX~SEX+cDAY, random=~1|TRANSMITTER, correlation=corAR1(form=~1|TRANSMITTER) ,data=data, method="REML")
 
 mod.pi<-mod2
-best.pi<-mod2.d
+best.pi<-mod3
 #r.squaredGLMM(mod.pi)
 
 
@@ -926,13 +908,13 @@ best.pi<-mod2.d
 
 #check assumptions
 #heterogeneity
-#plot(fitted(mod.pi), residuals(mod.pi, type="normalized"), xlab = "Fitted Values", ylab = "Residuals")
+#plot(fitted(best.pi), residuals(best.pi, type="normalized"), xlab = "Fitted Values", ylab = "Residuals")
 #abline(h = 0, lty = 2)
-#lines(smooth.spline(fitted(mod.pi), residuals(mod.pi, type="normalized")),col="red")
+#lines(smooth.spline(fitted(best.pi), residuals(best.pi, type="normalized")),col="red")
 #normality
-#hist(residuals(mod.pi,type="normalized"))
+#hist(residuals(best.pi,type="normalized"))
 #independence
-#acf(residuals(mod.pi,type="normalized"))
+#acf(residuals(best.pi,type="normalized"))
 
 ```
 
@@ -976,61 +958,33 @@ mod2<-lme(log(ACCELMEAN)~SEX+cDAY+I(cDAY^2)+YEAR, random=~1|TRANSMITTER, correla
 
 mod2<-lme(log(ACCELMEAN)~SEX+cDAY+I(cDAY^2)+YEAR, random=~1|TRANSMITTER, correlation=corAR1(form=~1|TRANSMITTER) ,data=data.ac, method="ML")
 
-#mod2<-lme(log(ACCELMEAN)~SEX, random=~1|TRANSMITTER, correlation=corAR1(form=~1|TRANSMITTER) ,data=data.ac, method="ML")
+#dredge(mod2)
 
-#test significance of intereaction
-mod2.a<-update(mod2,.~.-SEX)# drop interaction
-#anova(mod2,mod2.a)#not significant remove
+mod3<-lme(log(ACCELMEAN)~SEX+I(cDAY^2), random=~1|TRANSMITTER, correlation=corAR1(form=~1|TRANSMITTER) ,data=data.ac, method="REML")
 
-mod2.b<-update(mod2,.~.-cDAY)# drop interaction
-#anova(mod2,mod2.b)#not significant remove
-
-mod2.c<-update(mod2,.~.-I(cDAY^2))# drop interaction
-#anova(mod2,mod2.c)#not significant remove
-
-mod2.d<-update(mod2,.~.-YEAR)# drop interaction
-#anova(mod2,mod2.d)#not significant remove
-
-#best model
-mod2.a<-update(mod2.d,.~.-SEX)# drop interaction
-#anova(mod2.d,mod2.a)#not significant remove
-
-
-mod2.b<-update(mod2.d,.~.-cDAY)# drop interaction
-#anova(mod2.d,mod2.b)#not significant remove
-
-mod2.c<-update(mod2.d,.~.-I(cDAY^2))# drop interaction
-#anova(mod2.d,mod2.c)#not significant remove
-
-mod2.a<-update(mod2.b,.~.-SEX)# drop interaction
-#anova(mod2.b,mod2.a)#not significant remove
-
-mod2.c<-update(mod2.b,.~.-I(cDAY^2))# drop interaction
-#anova(mod2.b,mod2.c)#not significant remove
-
-
-
+#Anova(mod3)
+#mod3<-update(mod2,.~.-YEAR)
+#Anova(mod3)
 
 mod.ac<-mod2
-best.ac<-mod2.b
-#mod.ac<-update(mod.ac,.~.-YEAR)
 
-#r.squaredGLMM(mod.ac)
+best.ac<-mod3
+#mod.ac<-update(mod.ac,.~.-YEAR)
 #kable(Anova(mod2.b,type=2))
 
 
 #check assumptions
 #heterogeneity
-#plot(fitted(mod.ac), residuals(mod.ac, type="normalized"), xlab = "Fitted Values", ylab = "Residuals")
+#plot(fitted(best.ac), residuals(best.ac, type="normalized"), xlab = "Fitted Values", ylab = "Residuals")
 #abline(h = 0, lty = 2)
-#lines(smooth.spline(fitted(mod.ac), residuals(mod.ac, type="normalized")),col="red")
+#lines(smooth.spline(fitted(best.ac), residuals(best.ac, type="normalized")),col="red")
 #normality
 #hist(residuals(mod.ac,type="normalized"))
 #independence
 #acf(residuals(mod.ac,type="normalized"))
 ```
 
-```{r basicmove,fig.cap=tabs("basicmove",caption="Summary statistics for spawning male, spawning female and non-spawning female lake trout movement metrics during the 2013 spawning season in Alexie Lake, NWT. I report the number of fish (n), means and standard deviations of daily distance travelled (km), persistence index (PI), and acceleration (m s^-2^).")}
+```{r basicmove, echo=FALSE,message=FALSE, warning=FALSE,fig.cap=tabs("basicmove",caption="Summary statistics for spawning male, spawning female and non-spawning female lake trout movement metrics during the 2013 spawning season in Alexie Lake, NWT. I report the number of fish (n), means and standard deviations of daily distance travelled (km), persistence index (PI), and acceleration (m s^-2^).")}
 
 data<-spawntable[spawntable$MONTH==9,]
 #remove month
@@ -1038,6 +992,8 @@ data<-data[,-2]
 data<-data[!data$SEX=="U",]
 data$YEAR<-as.character(data$YEAR)
 #digits(data,2)
+data[,c(4,5)]<-data[,c(4,5)]/1000
+data[,c(4:9)]<-round(data[,c(4:9)],2)
 
 data$ACCEL.SD[is.nan(data$ACCEL.SD)]<-"-"
 data$ACCEL.MEAN[is.nan(data$ACCEL.MEAN)]<-"-"
@@ -1047,12 +1003,20 @@ colnames(data)<-c("Year","Sex","n","Daily Displacement","Std. Dev.",
 
 
 kable(data, digits=2)
+
+mf<-new.daily %>%
+    filter(!TRANSMITTER=="LT-32" & MONTH==9 & !SEX=="U") %>%
+  group_by(SEX) %>%
+  summarise(STEPLENGTH=mean(STEPLENGTH, na.rm=TRUE),
+            PERSINDEX=mean(PERSINDEX, na.rm=TRUE),
+            ACCEL=mean(ACCELMEAN,na.rm=TRUE))
+
 ```
 
-```{r, eval=FALSE, ech=FALSE}
+```{r, eval=FALSE, echo=FALSE}
 ###Lake trout spawning behaviour
 
- Over the course of the spawning season lake trout daily distance travelled was not significantly different between spawning males and females with both sexes moving ~ 7 km per day (tabs("basicmove",cite=TRUE). The non-spawning female did show a higher daily displace of `r round(mean(daily$STEPLENGTH[daily$TRANSMITTER=="LT-32"])/1000,digits=2)` (&plusmn;`r round(sd(daily$STEPLENGTH[daily$TRANSMITTER=="LT-32"])/1000,digits=2)`; table 1). Spawning females made more linear movements than males, as indicated by females having a significantly higher persistence index (Wilcoxon Rank Sum Test: *W* = `r pi.test$statistic`; *p* `r ifelse(pi.test$p.value<0.001,"< 0.001",paste("= ",round(pi.test$p.value,digits=3),sep=""))`; table 1). The non-spawning female also made more directed movement consisitent with spawning females but with a greater PI (`r round(mean(daily$PERSINDEX[daily$TRANSMITTER=="LT-32"]),digits=2)` &plusmn; `r round(sd(daily$PERSINDEX[daily$TRANSMITTER=="LT-32"]),digits=2)`; table 1). Spawning males exerted significantly more energy than females over the course of the spawning season in spite of similar daily displacements, exhibiting daily acceleration rates `r round(spawntable$ACCEL[1]-spawntable$ACCEL[2],digits=2)` m s^-2^ greater than females (*W*= `r accel.test$statistic`; *p* `r ifelse(accel.test$p.value<0.001,"< 0.001",paste("= ",round(accel.test$p.value,digits=3),sep=""))`; table 3.1). The non-spawning female also showed similer acceleration as spawning females (`r round(mean(daily$ACCEL[daily$TRANSMITTER=="LT-32"]),digits=2)` &plusmn; `r round(sd(daily$ACCEL[daily$TRANSMITTER=="LT-32"]),digits=2)`; table 1).  
+ Over the course of the spawning season lake trout daily distance travelled was not significantly different between spawning males and females with both sexes moving on average > 8 km per day across all years (tabs("basicmove",cite=TRUE). Spawning females made more linear movements than males, as indicated by females having a significantly higher persistence index (Wilcoxon Rank Sum Test: *W* = `r anova(best.pi,type="marginal")["SEX","p-value"]`; *p* `r ifelse(pi.test$p.value<0.001,"< 0.001",paste("= ",round(pi.test$p.value,digits=3),sep=""))`; table 1). The non-spawning female also made more directed movement consisitent with spawning females but with a greater PI (`r round(mean(daily$PERSINDEX[daily$TRANSMITTER=="LT-32"]),digits=2)` &plusmn; `r round(sd(daily$PERSINDEX[daily$TRANSMITTER=="LT-32"]),digits=2)`; table 1). Spawning males exerted significantly more energy than females over the course of the spawning season in spite of similar daily displacements, exhibiting daily acceleration rates `r round(spawntable$ACCEL[1]-spawntable$ACCEL[2],digits=2)` m s^-2^ greater than females (*W*= `r accel.test$statistic`; *p* `r ifelse(accel.test$p.value<0.001,"< 0.001",paste("= ",round(accel.test$p.value,digits=3),sep=""))`; table 3.1). The non-spawning female also showed similer acceleration as spawning females (`r round(mean(daily$ACCEL[daily$TRANSMITTER=="LT-32"]),digits=2)` &plusmn; `r round(sd(daily$ACCEL[daily$TRANSMITTER=="LT-32"]),digits=2)`; table 1).  
 ```    
 
 

@@ -1097,6 +1097,9 @@ suntimes$DUSK<-hour(suntimes$DUSK)+minute(suntimes$DUSK)/60+second(suntimes$DUSK
 
 
 
+#nearest neighbour of each point
+
+
 
 save(ltspawnclust,dailytemp,first.clust,spawn.num,cluster,shore_outline,
      daily, spawntable, spawn, mcpclust, all_mcp,mcpoverlap,depth15,new.daily, 
